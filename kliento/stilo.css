@@ -1,0 +1,51 @@
+*{
+    padding: 0px;
+    margin: 0px;
+}
+#supru{
+    background-color: #AFB42B;
+    height: 10vh;
+    width: 100%;
+}
+#malsupru{
+    background-color: #AFB42B;
+    height: 10vh;
+    width: 100%;
+}
+#dekstru{
+    background-color: #CDDC39;
+    height: 100%;
+    width: 10%;
+}
+#maldekstru{
+    background-color: #CDDC39;
+    height: 100%;
+    width: 10%;
+}
+#inline{
+    height: 80vh;
+    width: 100%;
+    border-spacing: 0px;
+}
+#mapo{
+    background-color:green;
+    height: 100%;
+    width: 100%;
+    border-spacing: 1.41px;
+}
+td{
+    text-align: center;
+}
+.nigra{
+    background-color: #212121;
+    color: white;
+}
+.griza{
+    background-color: #757575;
+}
+.neniu{
+    background-color: green;
+}
+.natura{
+    background-color: white;
+}
