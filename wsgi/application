@@ -91,8 +91,8 @@ def subskribi(nomo, pasvorto):
         return json.dumps(False)
     except Uzanto.DoesNotExist:
         uzanto = Uzanto(nomo=nomo, pasvorto=get_hashed_password(pasvorto))
-        UzantoVidPunkto.create(uzanto=uzanto, parto=1)
         uzanto.save()
+        UzantoVidPunkto.create(uzanto=uzanto, parto=1)
         return json.dumps(True)
 
 @app.get("/ensaluti/<nomo>/<pasvorto>")
