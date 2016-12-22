@@ -150,7 +150,13 @@ def konstrui(seanco, x, y):
     y = int(y)
     parto = Parto.get(Parto.x == x, Parto.y == y)
     partoj = Parto.select().where( (Parto.x <= x+1) & (Parto.x >= x-1) & (Parto.y <= y+1) & (Parto.y >= y-1) & ~((Parto.x == x) & (Parto.y == y)) & (Parto.uzanto == uzanto) )
+    #TOFARI cxu 'or' kontrolas du ambaux statoj aux unua nur do dua?
     if parto.uzanto.id == 1 and partoj.count() >= 1:
+        Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
+        uzanto.mono -= 1
+        uzanto.save()
+        return json.dumps(True)
+    elif parto.uzanto.id == 1 and Parto.select().join(Uzanto, on=(Uzanto.id == Parto.uzanto)).where(Parto.uzanto == uzanto).count() == 0:
         Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
         uzanto.mono -= 1
         uzanto.save()
