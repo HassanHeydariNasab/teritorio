@@ -1,5 +1,5 @@
-//var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+//var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 r.res('mapo')
 r.res('vidpunkto')
 r.res('konstrui')
@@ -122,8 +122,9 @@ function mapi(mapo){
   x = window.localStorage.getItem('x')
   y = window.localStorage.getItem('y')
   var m = document.getElementById('mapo')
+  var informoj = document.getElementById('informoj')
   var t = ''
-  var nomo, uzanto, koloro
+  var nomo, uzanto, koloro, nivelo
   uzanto = mapo['uzanto']
   for (j=+y-2;j<=+y+2;j++){
     t += '<tr>'
@@ -133,6 +134,12 @@ function mapi(mapo){
       }
       catch(e){
         nomo = 'neniu'
+      }
+      try{
+        nivelo = mapo[i+':'+j]['nivelo']
+      }
+      catch(e){
+        nivelo = ''
       }
       if (nomo == uzanto){
         koloro = 'nigra'
@@ -146,11 +153,12 @@ function mapi(mapo){
       else{
         koloro = 'griza'
       }
-      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+i.toString()+', '+j.toString()+'</td>'
+      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+i.toString()+', '+j.toString()+'<br>'+nivelo+'</td>'
     }
     t += '</tr>'
   }
   m.innerHTML = t
+  informoj.innerHTML = mapo['mono']
 }
 
 function konstrui(i, j){

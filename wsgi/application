@@ -34,6 +34,8 @@ class Parto(Model):
     x = IntegerField()
     y = IntegerField()
     uzanto = ForeignKeyField(Uzanto, default=1)
+    minajxo = IntegerField(default=0)
+    nivelo = IntegerField(default=1)
     kreota = DateTimeField(default=datetime.datetime.now())
     class Meta:
         database = db
@@ -56,8 +58,6 @@ def check_password(plain_text_password, hashed_password):
     # Check hased password. Useing bcrypt, the salt is saved into the hash itself
     return bcrypt.checkpw(plain_text_password, hashed_password)
 
-#Uzanto.insert(nomo="hsn6", pasvorto=get_hashed_password("1234")).execute()
-
 def krei_mondon(x, y):
     for i in range(0, x):
         for j in range(0, y):
@@ -72,6 +72,9 @@ def ensalutita(seanco):
         return True
     except Uzanto.DoesNotExist:
         return False
+    
+def najbaraj_partoj(x, y, uzanto):
+    return Parto.select().where( (Parto.x <= x+1) & (Parto.x >= x-1) & (Parto.y <= y+1) & (Parto.y >= y-1) & ~((Parto.x == x) & (Parto.y == y)) & (Parto.uzanto == uzanto) )
 
 @app.route('/')
 def index():
@@ -132,8 +135,8 @@ def mapo(seanco, x, y):
     vidparto = Parto.get(Parto.x == x, Parto.y == y)
     UzantoVidPunkto.update(parto=vidparto).where(UzantoVidPunkto.uzanto == uzanto).execute()
     partoj = Parto.select().where( (Parto.x < x+10) & (Parto.x > x-10) & (Parto.y < y+10) & (Parto.y > y-10) )
-    mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'kreota':time.mktime(parto.kreota.timetuple())}) for parto in partoj])
-    mapo.update({'uzanto':uzanto.nomo})
+    mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'kreota':time.mktime(parto.kreota.timetuple()), 'nivelo':parto.nivelo, 'minajxo':parto.minajxo}) for parto in partoj])
+    mapo.update({'uzanto':uzanto.nomo, 'mono':uzanto.mono})
     return json.dumps(mapo)
 
 @app.route('/vidpunkto/<seanco>')
@@ -148,18 +151,26 @@ def konstrui(seanco, x, y):
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     x = int(x)
     y = int(y)
-    parto = Parto.get(Parto.x == x, Parto.y == y)
+    try:
+        parto = Parto.get(Parto.x == x, Parto.y == y)
+    except Parto.DoesNotExist:
+        return json.dumps(False)
     partoj = Parto.select().where( (Parto.x <= x+1) & (Parto.x >= x-1) & (Parto.y <= y+1) & (Parto.y >= y-1) & ~((Parto.x == x) & (Parto.y == y)) & (Parto.uzanto == uzanto) )
-    #TOFARI cxu 'or' kontrolas du ambaux statoj aux unua nur do dua?
-    if parto.uzanto.id == 1 and partoj.count() >= 1:
+    if parto.uzanto.id == 1 and partoj.count() >= 1 and uzanto.mono >= 1:
         Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
-        uzanto.mono -= 1
-        uzanto.save()
+        Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
-    elif parto.uzanto.id == 1 and Parto.select().join(Uzanto, on=(Uzanto.id == Parto.uzanto)).where(Parto.uzanto == uzanto).count() == 0:
+    elif parto.uzanto.id == 1 and Parto.select().join(Uzanto, on=(Uzanto.id == Parto.uzanto)).where(Parto.uzanto == uzanto).count() == 0 and uzanto.mono >= 1:
         Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
-        uzanto.mono -= 1
-        uzanto.save()
+        Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
+        return json.dumps(True)
+    elif parto.uzanto == uzanto and uzanto.mono >= 1:
+        Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
+        Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
+        return json.dumps(True)
+    elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj.count() >= 1:
+        Parto.update(uzanto=uzanto, nivelo=(Parto.nivelo/2)+1).where(Parto.x == x, Parto.y == y).execute()
+        Uzanto.update(mono=Uzanto.mono-parto.nivelo).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
     else:
         return json.dumps(False)

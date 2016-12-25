@@ -3,32 +3,48 @@
     margin: 0px;
 }
 #supru{
-    background-color: #AFB42B;
+    background-color: #2e7d32;
+    background-image: url('supre.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
     height: 10vh;
     width: 100%;
 }
 #malsupru{
-    background-color: #AFB42B;
+    background-color: #2e7d32;
+    background-image: url('malsupre.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
     height: 10vh;
     width: 100%;
 }
 #dekstru{
-    background-color: #CDDC39;
+    background-color: #388e3c;
+    background-image: url('dekstre.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
     height: 100%;
     width: 10%;
 }
 #maldekstru{
-    background-color: #CDDC39;
+    background-color: #388e3c;
+    background-image: url('maldekstre.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
     height: 100%;
     width: 10%;
 }
 #inline{
-    height: 80vh;
+    height: 70vh;
     width: 100%;
     border-spacing: 0px;
 }
 #mapo{
-    background-color:green;
+    background-color: #9e9d24;
     height: 100%;
     width: 100%;
     border-spacing: 1.41px;
@@ -44,8 +60,16 @@ td{
     background-color: #757575;
 }
 .neniu{
-    background-color: green;
+    background-color: #9e9d24;
 }
 .natura{
     background-color: white;
+}
+#informoj{
+    background-color: #212121;
+    color: white;
+    height: 10vh;
+    width: 100%;
+    line-height: 10vh;
+    text-align: center;
 }
