@@ -1,2 +1,4 @@
+from playhouse.migrate import *
 migrator = SqliteMigrator(db)
-migrate(migrator.add_column('Model', 'field', field),)
+migrator = MySQLMigrator(db)
+migrate(migrator.add_column('parto', 'minajxo', minajxo),)

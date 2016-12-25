@@ -136,7 +136,11 @@ def mapo(seanco, x, y):
     UzantoVidPunkto.update(parto=vidparto).where(UzantoVidPunkto.uzanto == uzanto).execute()
     partoj = Parto.select().where( (Parto.x < x+10) & (Parto.x > x-10) & (Parto.y < y+10) & (Parto.y > y-10) )
     mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'kreota':time.mktime(parto.kreota.timetuple()), 'nivelo':parto.nivelo, 'minajxo':parto.minajxo}) for parto in partoj])
-    mapo.update({'uzanto':uzanto.nomo, 'mono':uzanto.mono})
+    minejoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == uzanto.id))
+    gajnanto = 0
+    for minejo in minejoj:
+        gajnanto += minejo.nivelo
+    mapo.update({'uzanto':uzanto.nomo, 'mono':uzanto.mono, 'gajnanto':gajnanto})
     return json.dumps(mapo)
 
 @app.route('/vidpunkto/<seanco>')

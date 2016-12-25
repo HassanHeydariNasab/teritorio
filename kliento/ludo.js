@@ -124,7 +124,7 @@ function mapi(mapo){
   var m = document.getElementById('mapo')
   var informoj = document.getElementById('informoj')
   var t = ''
-  var nomo, uzanto, koloro, nivelo
+  var nomo, uzanto, koloro, nivelo, minajxo
   uzanto = mapo['uzanto']
   for (j=+y-2;j<=+y+2;j++){
     t += '<tr>'
@@ -141,6 +141,12 @@ function mapi(mapo){
       catch(e){
         nivelo = ''
       }
+      try{
+        minajxo = mapo[i+':'+j]['minajxo']
+      }
+      catch(e){
+        minajxo = ''
+      }
       if (nomo == uzanto){
         koloro = 'nigra'
       }
@@ -153,12 +159,12 @@ function mapi(mapo){
       else{
         koloro = 'griza'
       }
-      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+i.toString()+', '+j.toString()+'<br>'+nivelo+'</td>'
+      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+i.toString()+', '+j.toString()+'<br>'+nivelo+'<br>'+minajxo+'</td>'
     }
     t += '</tr>'
   }
   m.innerHTML = t
-  informoj.innerHTML = mapo['mono']
+  informoj.innerHTML = mapo['mono'] +'  '+ mapo['gajnanto']
 }
 
 function konstrui(i, j){
