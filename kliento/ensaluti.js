@@ -1,5 +1,5 @@
-var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-//var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+//var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 r.res('ensaluti')
 function ensaluti(){
   var nomo = document.getElementById("nomo").value
