@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 import os, json, re, bcrypt, datetime, time
 from peewee import *
+from playhouse.pool import *
 from bottle import Bottle, request, response, hook
 from urllib.parse import urlparse
 
 if 'OPENSHIFT_DATA_DIR' in os.environ:
     #db = SqliteDatabase(os.environ['OPENSHIFT_DATA_DIR']+'datumaro.db')
     url = urlparse(os.environ.get('OPENSHIFT_MYSQL_DB_URL'))
-    db = MySQLDatabase(os.environ['OPENSHIFT_APP_NAME'], host=url.hostname, port=url.port, user=url.username, passwd=url.password)
+    db = PooledMySQLDatabase(os.environ['OPENSHIFT_APP_NAME'], host=url.hostname, port=url.port, user=url.username, passwd=url.password)
 else:
-    db = SqliteDatabase('datumaro.db')
+    db = PooledSqliteDatabase('datumaro.db')
 
 @hook('before_request')
 def _connect_db():
