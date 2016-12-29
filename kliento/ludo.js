@@ -1,5 +1,5 @@
-//var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+//var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 r.res('mapo')
 r.res('vidpunkto')
 r.res('konstrui')
@@ -10,6 +10,10 @@ var supru = document.getElementById('supru')
 var malsupru = document.getElementById('malsupru')
 var dekstru = document.getElementById('dekstru')
 var maldekstru = document.getElementById('maldekstru')
+
+function persa(cifero){
+  return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
+}
 
 //x esatas por nuna x
 var x, y
@@ -35,6 +39,25 @@ window.addEventListener('load', function(){
     })
   })
 })
+
+function iru(){
+  //xp: provizora x
+  var xp = document.getElementById('x').value
+  var yp = document.getElementById('y').value
+  if(xp && yp){
+  r.mapo(window.localStorage.getItem('seanco')+'/'+xp+'/'+yp).get().then(function(m){
+    xs = xp
+    ys = yp
+    x = xp
+    y = yp
+    window.localStorage.setItem('x', x)
+    window.localStorage.setItem('y', y)
+    mm = m
+    mapi(m)
+  })
+}
+}
+
 
 supru.addEventListener('click', function(){
   x = window.localStorage.getItem('x')
@@ -145,26 +168,29 @@ function mapi(mapo){
         minajxo = mapo[i+':'+j]['minajxo']
       }
       catch(e){
-        minajxo = ''
+        minajxo = '&nbsp;'
       }
+      if(minajxo == 0){minajxo = '&nbsp;'}else{minajxo = '&rlm;'+persa(minajxo.toString())+' بلوک'}
       if (nomo == uzanto){
         koloro = 'nigra'
       }
       else if(nomo == 'naturo'){
         koloro = 'natura'
+        nomo = 'طبیعت'
       }
       else if(nomo == 'neniu'){
         koloro = 'neniu'
+        nomo = '&nbsp;'
       }
       else{
         koloro = 'griza'
       }
-      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+i.toString()+', '+j.toString()+'<br>'+nivelo+'<br>'+minajxo+'</td>'
+      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+persa(i.toString())+', '+persa(j.toString())+'<br>سطح '+persa(nivelo.toString())+'<br>'+minajxo+'</td>'
     }
     t += '</tr>'
   }
   m.innerHTML = t
-  informoj.innerHTML = mapo['mono'] +'  '+ mapo['gajnanto']
+  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک موجودی و روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک'
 }
 
 function konstrui(i, j){

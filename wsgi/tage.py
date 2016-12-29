@@ -6,7 +6,7 @@ from application import Uzanto, Parto, UzantoVidPunkto, db
 
 db.connect()
 
-Uzanto.update(mono=Uzanto.mono+10).where(Uzanto.id != 1).execute()
+Uzanto.update(mono=Uzanto.mono+7).where(Uzanto.id != 1).execute()
 
 partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto != 1))
 for parto in partoj:

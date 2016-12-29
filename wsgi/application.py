@@ -138,7 +138,7 @@ def mapo(seanco, x, y):
     partoj = Parto.select().where( (Parto.x < x+10) & (Parto.x > x-10) & (Parto.y < y+10) & (Parto.y > y-10) )
     mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'kreota':time.mktime(parto.kreota.timetuple()), 'nivelo':parto.nivelo, 'minajxo':parto.minajxo}) for parto in partoj])
     minejoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == uzanto.id))
-    gajnanto = 0
+    gajnanto = 7
     for minejo in minejoj:
         gajnanto += minejo.nivelo
     mapo.update({'uzanto':uzanto.nomo, 'mono':uzanto.mono, 'gajnanto':gajnanto})

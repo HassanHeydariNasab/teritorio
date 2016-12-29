@@ -1,0 +1,1 @@
+Parto.update(minajxo=1000).where(Parto.id << list(range(0,2500,10))).execute()

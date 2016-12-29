@@ -1,9 +1,16 @@
+@font-face {
+    font-family: vzr;
+    src: url('Vazir.woff');
+}
 *{
     padding: 0px;
     margin: 0px;
 }
+body{
+    font-family: vzr;
+}
 #supru{
-    background-color: #2e7d32;
+    background-color: #FF9800;
     background-image: url('supre.svg');
     background-repeat: no-repeat;
     background-position: center;
@@ -12,52 +19,54 @@
     width: 100%;
 }
 #malsupru{
-    background-color: #2e7d32;
+    background-color: #FF9800;
     background-image: url('malsupre.svg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
     height: 10vh;
-    width: 100%;
+    width: 60%;
 }
 #dekstru{
-    background-color: #388e3c;
+    background-color: #FF9800;
     background-image: url('dekstre.svg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    height: 100%;
-    width: 10%;
+    height: 10vh;
+    width: 20%;
 }
 #maldekstru{
-    background-color: #388e3c;
+    background-color: #FF9800;
     background-image: url('maldekstre.svg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    height: 100%;
-    width: 10%;
+    height: 10vh;
+    width: 20%;
 }
 #inline{
-    height: 70vh;
-    width: 100%;
+    width: 100vw;
+    height: 10vh;
     border-spacing: 0px;
 }
 #mapo{
-    background-color: #9e9d24;
-    height: 100%;
+    background-color: #212121;
+    height: 60vh;
     width: 100%;
     border-spacing: 1.41px;
+    font-family: sans;
+    font-size: calc(1vh + 2vw);
 }
 td{
     text-align: center;
 }
 .nigra{
-    background-color: #212121;
+    background-color: #424242;
     color: white;
 }
 .griza{
-    background-color: #757575;
+    background-color: #9e9e9e;
 }
 .neniu{
     background-color: #9e9d24;
@@ -68,8 +77,97 @@ td{
 #informoj{
     background-color: #212121;
     color: white;
-    height: 10vh;
+    height: calc(10vh - 1px);
     width: 100%;
     line-height: 10vh;
     text-align: center;
+    border-bottom: #424242 1px solid;
+    font-size: calc(1.5vh + 2.5vw);
+    direction: rtl;
+}
+ujo{
+    height: 100vh;
+    width: 100vw;
+    background-color: #eeeeee;
+    display: table-cell;
+    align-content: center;
+    vertical-align: middle;
+    direction: rtl;
+}
+input{
+    display: block;
+    direction: ltr;
+    padding-left: 5px;
+    margin-right: 10vw;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0px;
+    border-color: #212121;
+    height: calc(7vh + 2vw);
+    width: 70vw;
+    font-size: calc(3vh + 2vw);
+    background-color: #424242;
+    color: #fff;
+}
+label{
+    padding-right: 3vw;
+    font-size: calc(3vh + 2vw);
+}
+.formgrupo{
+    margin-top: 4vh;
+}
+#ensalutu{
+    background-color: #424242;
+    color: #fff;
+    text-align: center;
+    margin-top: 5vh;
+    font-size: calc(4vh + 4vw);
+    padding: 10px 0px;
+    box-shadow: inset 0 14px 28px rgba(0,0,0,0.25), inset 0 10px 10px rgba(0,0,0,0.22);
+}
+form{
+    background-color: #bdbdbd;
+    padding-top: calc(10vh - 6vw);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+a{
+    text-decoration: none;
+    line-height: 20vh;
+    padding-right: 3vw;
+    font-size: calc(2.7vh + 1.8vw);
+    color: #424242;
+}
+#iri{
+    background-color: #212121;
+    color: white;
+    width: 100%;
+    height: 10vh;
+}
+#x, #y{
+    display: inline;
+    width: 15vw;
+    line-height: 10vh;
+    background-color: #424242;
+    height: calc(100% - 2px);
+    border-width: 0px;
+    color: #fff;
+    margin-right: 7vw;
+}
+#iri > #poz > label{
+    display: inline;
+    padding-left: 2vw;
+}
+#iru{
+    background-color: #212121;
+    color: #fff;
+    display: inline;
+    font-size: calc(2vh + 3vw);
+    width: 20%;
+    height: 90%;
+    border: none;
+    font-family: vzr;
+}
+#poz{
+    width:80%;
+    display: inline;
 }
