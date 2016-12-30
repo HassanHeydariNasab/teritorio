@@ -1,4 +1,6 @@
-var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+//var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+//var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
 r.res('ensaluti')
 function ensaluti(){
   var nomo = document.getElementById("nomo").value
@@ -11,7 +13,7 @@ function ensaluti(){
       window.localStorage.setItem('seanco', k['seanco'])
       window.localStorage.setItem('x', k['x'])
       window.localStorage.setItem('y', k['y'])
-      window.location('ludo.html')
+      window.location = 'ludo.html'
       }
   })
 }

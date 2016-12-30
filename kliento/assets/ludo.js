@@ -1,8 +1,10 @@
-var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+//var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
 //var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
 r.res('mapo')
 r.res('vidpunkto')
 r.res('konstrui')
+r.res('ordo')
 
 var mm
 var cl = console.log
@@ -14,7 +16,29 @@ var maldekstru = document.getElementById('maldekstru')
 function persa(cifero){
   return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
 }
-
+function listi_acxeteblojn(){
+  var informoj = document.getElementById('informoj')
+  var iri = document.getElementById('iri')
+  window.localStorage.setItem('inforomoj', informoj.innerHTML)
+  iri.style.display = 'none'
+  informoj.style.height = 'calc(20vh - 1px)'
+  informoj.innerHTML = '<a href="javascript:Android.acxeti_dialogo(\'blokoj100\')">۱۰۰ بلوک</a>&nbsp;/&nbsp;<a href="javascript:Android.acxeti_dialogo(\'blokoj200\')">۲۰۰ بلوک</a>&nbsp;/&nbsp;<a href="javascript:Android.acxeti_dialogo(\'blokoj500\')">۵۰۰ بلوک</a>&nbsp;/&nbsp;<a href="javascript:Android.acxeti_dialogo(\'blokoj1000\')">۱۰۰۰ بلوک</a><br><a href="javascript:mallisti_acxeteblojn()">بازگشت</a>'
+}
+function mallisti_acxeteblojn(){
+  var informoj = document.getElementById('informoj')
+  var iri = document.getElementById('iri')
+  informoj.innerHTML = window.localStorage.getItem('inforomoj')
+  iri.style.display = ''
+  informoj.style.height = 'calc(10vh - 1px)'
+}
+function sendi_ordojn(){
+  r.ordo(window.localStorage.getItem('seanco')+'/'+window.localStorage.getItem('ordoj')).get().then(function(k){
+    if(k){
+      window.localStorage.setItem('ordoj', '');
+      window.location.reload()
+    }
+  })
+}
 //x esatas por nuna x
 var x, y
 //xs estas por lasta x ke la mapo elsxutigxis
@@ -27,16 +51,19 @@ if (!(seanco)){
 }
 window.addEventListener('load', function(){
   r.vidpunkto(window.localStorage.getItem('seanco')).get().then(function(vidpunkto){
-    x = vidpunkto['x']
-    y = vidpunkto['y']
-    window.localStorage.setItem('x', x)
-    window.localStorage.setItem('y', y)
-    r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
-      xs = x
-      ys = y
-      mm = m
-      mapi(m)
-    })
+    if(!vidpunkto){window.location = 'ensaluti.html'}
+    else{
+      x = vidpunkto['x']
+      y = vidpunkto['y']
+      window.localStorage.setItem('x', x)
+      window.localStorage.setItem('y', y)
+      r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
+        xs = x
+        ys = y
+        mm = m
+        mapi(m)
+      })
+    }
   })
 })
 
@@ -168,9 +195,9 @@ function mapi(mapo){
         minajxo = mapo[i+':'+j]['minajxo']
       }
       catch(e){
-        minajxo = '&nbsp;'
+        minajxo = ''
       }
-      if(minajxo == 0){minajxo = '&nbsp;'}else{minajxo = '&rlm;'+persa(minajxo.toString())+' بلوک'}
+      if(minajxo == 0 || !minajxo){minajxo = '&nbsp;'}else{minajxo = '&rlm;'+persa(minajxo.toString())+' بلوک'}
       if (nomo == uzanto){
         koloro = 'nigra'
       }
@@ -185,12 +212,13 @@ function mapi(mapo){
       else{
         koloro = 'griza'
       }
-      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+persa(i.toString())+', '+persa(j.toString())+'<br>سطح '+persa(nivelo.toString())+'<br>'+minajxo+'</td>'
+      if(nivelo){nivelo = 'سطح ' + persa(nivelo.toString())}else{nivelo = '&nbsp;'}
+      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+persa(i.toString())+':'+persa(j.toString())+'<br>'+nivelo+'<br>'+minajxo+'</td>'
     }
     t += '</tr>'
   }
   m.innerHTML = t
-  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک موجودی و روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک'
+  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک موجودی / روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک / ' + '<a href="javascript:listi_acxeteblojn()">خرید</a>'
 }
 
 function konstrui(i, j){

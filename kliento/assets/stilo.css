@@ -55,7 +55,7 @@ body{
     height: 60vh;
     width: 100%;
     border-spacing: 1.41px;
-    font-family: sans;
+    font-family: monospace;
     font-size: calc(1vh + 2vw);
 }
 td{
@@ -170,4 +170,10 @@ a{
 #poz{
     width:80%;
     display: inline;
+}
+#informoj > a{
+    line-height: 0px;
+    padding-right: 0px;
+    color: #fff;
+    font-size: calc(1.5vh + 2.2vw);
 }

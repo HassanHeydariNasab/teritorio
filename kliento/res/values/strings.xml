@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">قلمرو</string>
+  <string name="quit">خروج از بازی</string>
+  <string name="really_quit">مطمئنید که می‌خواهید خارج شوید؟</string>
+  <string name="yes">بله</string>
+  <string name="no">خیر</string>
+  <string name="really_buy">خرید انجام شود؟</string>
+  <string name="buy">خرید بلوک</string>
+  <string name="bazar_neinstalita">بازار نصب نیست!</string>
+</resources>

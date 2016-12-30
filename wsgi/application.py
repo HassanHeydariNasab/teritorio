@@ -5,6 +5,7 @@ from peewee import *
 from playhouse.pool import *
 from bottle import Bottle, request, response, hook
 from urllib.parse import urlparse
+from urllib.request import urlopen
 
 if 'OPENSHIFT_DATA_DIR' in os.environ:
     #db = SqliteDatabase(os.environ['OPENSHIFT_DATA_DIR']+'datumaro.db')
@@ -47,8 +48,16 @@ class UzantoVidPunkto(Model):
     class Meta:
         database = db
 
+class Ordo(Model):
+    uzanto = ForeignKeyField(Uzanto)
+    jxetono = CharField()
+    sku = CharField()
+    uzita = BooleanField(default=False)
+    class Meta:
+        database = db
+
 #db.connect()
-#db.create_tables([UzantoVidPunkto])
+#db.create_tables([Ordo])
 
 def get_hashed_password(plain_text_password):
     # Hash a password for the first time
@@ -147,8 +156,11 @@ def mapo(seanco, x, y):
 @app.route('/vidpunkto/<seanco>')
 def vidpunkto(seanco):
     response.content_type = "application/json; charset=utf-8"
-    vidpunkto = UzantoVidPunkto.select().join(Uzanto).where(Uzanto.seanco == seanco).get().parto
-    return json.dumps({'x':str(vidpunkto.x),'y':str(vidpunkto.y)})
+    try:
+        vidpunkto = UzantoVidPunkto.select().join(Uzanto).where(Uzanto.seanco == seanco).get().parto
+        return json.dumps({'x':str(vidpunkto.x),'y':str(vidpunkto.y)})
+    except UzantoVidPunkto.DoesNotExist:
+        return json.dumps(False)
 
 @app.route('/konstrui/<seanco>/<x>/<y>')
 def konstrui(seanco, x, y):
@@ -165,7 +177,7 @@ def konstrui(seanco, x, y):
         Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
-    elif parto.uzanto.id == 1 and Parto.select().join(Uzanto, on=(Uzanto.id == Parto.uzanto)).where(Parto.uzanto == uzanto).count() == 0 and uzanto.mono >= 1:
+    elif Parto.select().join(Uzanto, on=(Uzanto.id == Parto.uzanto)).where(Parto.uzanto == uzanto).count() == 0 and uzanto.mono >= 1:
         Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
@@ -173,9 +185,34 @@ def konstrui(seanco, x, y):
         Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
-    elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj.count() >= 1:
+    elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj.count() >= 1 and uzanto.mono >= parto.nivelo+1:
         Parto.update(uzanto=uzanto, nivelo=(Parto.nivelo/2)+1).where(Parto.x == x, Parto.y == y).execute()
-        Uzanto.update(mono=Uzanto.mono-parto.nivelo).where(Uzanto.seanco == seanco).execute()
+        Uzanto.update(mono=Uzanto.mono-parto.nivelo-2).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
     else:
         return json.dumps(False)
+
+@app.route('/ordo/<seanco>/<ordoj>')
+def ordo(seanco, ordoj):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    ordoj = ordoj.split(',')
+    for ordo in ordoj:
+        ordo = ordo.split('-')
+        try:
+            jxetono = ordo[0]
+            sku = ordo[1]
+        except IndexError:
+            break;
+        #PORFARI kontrolu la ordon per Bazar
+        '''
+        respondo = json.loads(str(urlopen('https://pardakht.cafebazaar.ir/devapi/v2/api/validate/<package_name>/inapp/<product_id>/purchases/<purchase_token>/').read())[2:-1])
+        try:
+            respondo['purchaseState'] == 0
+        except KeyError:
+            print(respondo['error']+' --> '+respondo['error_description'])
+        '''
+        Uzanto.update(mono = Uzanto.mono + int(sku[6:])).where(Uzanto.seanco == seanco).execute()
+        
+    return json.dumps(True)
+    
