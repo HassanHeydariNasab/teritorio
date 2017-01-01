@@ -2,12 +2,19 @@
     font-family: vzr;
     src: url('Vazir.woff');
 }
+@font-face {
+    font-family: mvzr;
+    src: url('Vazir-Code.woff');
+}
 *{
     padding: 0px;
     margin: 0px;
 }
 body{
     font-family: vzr;
+    height: 100vh;
+    width: 100vw;
+    max-height: 100vh;
 }
 #supru{
     background-color: #FF9800;
@@ -53,13 +60,20 @@ body{
 #mapo{
     background-color: #212121;
     height: 60vh;
+    max-height: 60vh;
     width: 100%;
-    border-spacing: 1.41px;
-    font-family: monospace;
-    font-size: calc(1vh + 2vw);
+    border-spacing: 1px;
+    font-family: mvzr;
+    font-size: calc(2vh);
+    table-layout:fixed;
+    *word-break:break-word;
 }
 td{
     text-align: center;
+    max-height: 12vh;
+    width: calc(20vw - 1px);
+    white-space: nowrap;
+    overflow: hidden;
 }
 .nigra{
     background-color: #424242;
@@ -89,12 +103,11 @@ ujo{
     height: 100vh;
     width: 100vw;
     background-color: #eeeeee;
-    display: table-cell;
     align-content: center;
     vertical-align: middle;
     direction: rtl;
 }
-input{
+input[type="text"], input[type="password"], input[type="number"]{
     display: block;
     direction: ltr;
     padding-left: 5px;
@@ -103,9 +116,9 @@ input{
     border-style: solid;
     border-radius: 0px;
     border-color: #212121;
-    height: calc(7vh + 2vw);
+    height: calc(8vh + 3vw);
     width: 70vw;
-    font-size: calc(3vh + 2vw);
+    font-size: calc(8vh + 2vw);
     background-color: #424242;
     color: #fff;
 }
@@ -120,7 +133,7 @@ label{
     background-color: #424242;
     color: #fff;
     text-align: center;
-    margin-top: 5vh;
+    margin-top: 14vh;
     font-size: calc(4vh + 4vw);
     padding: 10px 0px;
     box-shadow: inset 0 14px 28px rgba(0,0,0,0.25), inset 0 10px 10px rgba(0,0,0,0.22);
@@ -152,6 +165,7 @@ a{
     border-width: 0px;
     color: #fff;
     margin-right: 7vw;
+    font-size: calc(4vh + 2vw);
 }
 #iri > #poz > label{
     display: inline;
@@ -161,9 +175,9 @@ a{
     background-color: #212121;
     color: #fff;
     display: inline;
-    font-size: calc(2vh + 3vw);
+    font-size: calc(3vh + 3vw);
     width: 20%;
-    height: 90%;
+    height: 8vh;
     border: none;
     font-family: vzr;
 }

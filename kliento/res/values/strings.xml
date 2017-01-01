@@ -8,4 +8,8 @@
   <string name="really_buy">خرید انجام شود؟</string>
   <string name="buy">خرید بلوک</string>
   <string name="bazar_neinstalita">بازار نصب نیست!</string>
+  <string name="ok">تأیید</string>
+  <string name="cancel">لغو</string>
+  <string name="confirm">مطمئنید؟</string>
+  <string name="alert">اعلان</string>
 </resources>

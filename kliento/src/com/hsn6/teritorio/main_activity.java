@@ -21,6 +21,8 @@ import android.webkit.JavascriptInterface;
 import java.util.Arrays;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageInfo;
+import android.webkit.WebChromeClient;
+import android.webkit.JsResult;
 
 public class main_activity extends Activity
 {
@@ -54,8 +56,49 @@ public class main_activity extends Activity
 	webSettings.setAllowUniversalAccessFromFileURLs(true);
 	//webSettings.setAllowFileAccessFromFileURLs(true);
 	myWebView.setWebViewClient(new WebViewClient());
+	myWebView.setWebChromeClient(new WebChromeClient() {
+        public void onProgressChanged(WebView view, int progress) {
+            main_activity.this.setProgress(progress * 1000);
+        };
+		@Override
+		public boolean onJsAlert(WebView view, String url, String message, final android.webkit.JsResult result)
+		{
+		    new AlertDialog.Builder(main_activity.this)
+			.setTitle(R.string.alert)
+			.setMessage(message)
+			.setPositiveButton(R.string.ok,
+					   new AlertDialog.OnClickListener()
+					   {
+					       public void onClick(DialogInterface dialog, int wicht)
+					       {
+						   result.confirm();
+					       }
+					   }).setCancelable(false)
+			.create()
+			.show();
+		    return true;
+		};
+		@Override
+		public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
+		    new AlertDialog.Builder(main_activity.this)
+			.setTitle(R.string.confirm)
+			.setMessage(message)
+			.setPositiveButton(R.string.ok,
+					   new DialogInterface.OnClickListener() {
+					       public void onClick(DialogInterface dialog, int which) {
+						   result.confirm();
+					       }
+					   }).setNegativeButton(R.string.cancel, 
+								new DialogInterface.OnClickListener() {
+								    public void onClick(DialogInterface dialog, int which) {
+									result.cancel();
+								    }
+								}).setCancelable(false).create().show();
+		    return true;
+		};
+	    });	
 	myWebView.setOnLongClickListener(new View.OnLongClickListener() {
-	    @Override
+		@Override
 	    public boolean onLongClick(View v) {
 		return true;
 	    }
@@ -174,7 +217,20 @@ public class main_activity extends Activity
 		if (result.isFailure()) {
 		    Log.d(TAG, "Error purchasing: " + result);
 		    return;
-		}      
+		}
+		if (!verifyDeveloperPayload(purchase)) {
+		    Log.d(TAG, "Error purchasing. Authenticity verification failed.");
+		    return;
+		}
+
+		Log.d(TAG, "Purchase successful.");
+
+		if (purchase != null && verifyDeveloperPayload(purchase) && purchase.getPurchaseState() == 0) {
+		    Log.d(TAG, "We have sku. Consuming it.");
+		    mHelper.consumeAsync(purchase, mConsumeFinishedListener);
+		    return;
+		}
+		
 		/*else if (purchase.getSku().equals(sku100)) {
 		  myWebView.loadUrl("javascript:window.localStorage.sku = 0;");
 		  myWebView.reload();
@@ -255,6 +311,11 @@ public class main_activity extends Activity
 	    .setNegativeButton(R.string.no, null)
 	    .show();
     };
+    @JavascriptInterface
+    public void showToast(String toast) {
+        Toast.makeText(main_activity.this, toast, Toast.LENGTH_SHORT).show();
+    }
+    
     @Override
     public void onDestroy() {
         super.onDestroy();

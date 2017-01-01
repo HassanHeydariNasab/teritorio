@@ -145,7 +145,8 @@ def mapo(seanco, x, y):
     vidparto = Parto.get(Parto.x == x, Parto.y == y)
     UzantoVidPunkto.update(parto=vidparto).where(UzantoVidPunkto.uzanto == uzanto).execute()
     partoj = Parto.select().where( (Parto.x < x+10) & (Parto.x > x-10) & (Parto.y < y+10) & (Parto.y > y-10) )
-    mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'kreota':time.mktime(parto.kreota.timetuple()), 'nivelo':parto.nivelo, 'minajxo':parto.minajxo}) for parto in partoj])
+    #, 'kreota':time.mktime(parto.kreota.timetuple())
+    mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'nivelo':parto.nivelo, 'minajxo':parto.minajxo}) for parto in partoj])
     minejoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == uzanto.id))
     gajnanto = 7
     for minejo in minejoj:

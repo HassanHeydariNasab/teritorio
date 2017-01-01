@@ -1,6 +1,6 @@
 //var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-//var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
-var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
+var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+//var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
 r.res('mapo')
 r.res('vidpunkto')
 r.res('konstrui')
@@ -225,7 +225,12 @@ function konstrui(i, j){
   var k = confirm('مطمئنی می‌خوای بسازیش؟')
   if (k){
     r.konstrui(window.localStorage.getItem('seanco')+'/'+i.toString()+'/'+j.toString()).get().then(function(farita){
-      alert(farita)
+      if(farita){
+        alert('با موفقیت ساخته شد.')
+      }
+      else{
+        alert('ساخته نشد!')
+      }
       r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
         xs = x
         ys = y
