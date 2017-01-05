@@ -83,12 +83,12 @@ public class main_activity extends Activity
 		    new AlertDialog.Builder(main_activity.this)
 			.setTitle(R.string.confirm)
 			.setMessage(message)
-			.setPositiveButton(R.string.ok,
+			.setPositiveButton(R.string.yes,
 					   new DialogInterface.OnClickListener() {
 					       public void onClick(DialogInterface dialog, int which) {
 						   result.confirm();
 					       }
-					   }).setNegativeButton(R.string.cancel, 
+					   }).setNegativeButton(R.string.no, 
 								new DialogInterface.OnClickListener() {
 								    public void onClick(DialogInterface dialog, int which) {
 									result.cancel();
