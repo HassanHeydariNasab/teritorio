@@ -189,10 +189,6 @@ def konstrui(seanco, x, y):
         Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
-    elif parto.uzanto == 1 and Parto.select().join(Uzanto, on=(Uzanto.id == Parto.uzanto)).where(Parto.uzanto == uzanto).count() == 0 and uzanto.mono >= 1:
-        Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
-        Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
-        return json.dumps(True)
     elif parto.uzanto == uzanto and uzanto.mono >= 1:
         Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
@@ -200,6 +196,10 @@ def konstrui(seanco, x, y):
     elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj_uzanto.count() >= 1 and uzanto.mono >= parto.nivelo+2:
         Parto.update(uzanto=uzanto, nivelo=(Parto.nivelo/2)+1).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-parto.nivelo-2).where(Uzanto.seanco == seanco).execute()
+        return json.dumps(True)
+    elif parto.uzanto.id == 1 and Parto.select().where(Parto.uzanto_id == uzanto.id).count() == 0 and uzanto.mono >= 1:
+        Parto.update(uzanto=uzanto).where(Parto.id == parto.id).execute()
+        Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.id == uzanto.id).execute()
         return json.dumps(True)
     #etaj tekxnikoj:
     else:
