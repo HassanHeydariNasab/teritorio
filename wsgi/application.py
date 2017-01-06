@@ -9,8 +9,10 @@ from urllib.request import urlopen
 
 if 'OPENSHIFT_DATA_DIR' in os.environ:
     #db = SqliteDatabase(os.environ['OPENSHIFT_DATA_DIR']+'datumaro.db')
-    url = urlparse(os.environ.get('OPENSHIFT_MYSQL_DB_URL'))
-    db = PooledMySQLDatabase(os.environ['OPENSHIFT_APP_NAME'], host=url.hostname, port=url.port, user=url.username, passwd=url.password)
+    #url = urlparse(os.environ.get('OPENSHIFT_MYSQL_DB_URL'))
+    url = urlparse(os.environ.get('OPENSHIFT_POSTGRESQL_DB_URL'))
+    #db = PooledMySQLDatabase(os.environ['OPENSHIFT_APP_NAME'], host=url.hostname, port=url.port, user=url.username, passwd=url.password)
+    db = PooledPostgresqlDatabase(os.environ['OPENSHIFT_APP_NAME'], host=url.hostname, port=url.port, user=url.username, passwd=url.password)
 else:
     db = PooledSqliteDatabase('datumaro.db')
 
