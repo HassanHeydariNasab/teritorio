@@ -40,7 +40,6 @@ class Parto(Model):
     uzanto = ForeignKeyField(Uzanto, default=1)
     minajxo = IntegerField(default=0)
     nivelo = IntegerField(default=1)
-    kreota = DateTimeField(default=datetime.datetime.now())
     class Meta:
         database = db
 
@@ -85,11 +84,11 @@ def ensalutita(seanco):
     except Uzanto.DoesNotExist:
         return False
     
-def najbaraj_partoj(x, y, uzanto=False):
+def najbaraj_partoj(x, y, uzanto=False, profundo=1):
     if not uzanto:
-        return Parto.select().where( (Parto.x <= x+1) & (Parto.x >= x-1) & (Parto.y <= y+1) & (Parto.y >= y-1) & ~((Parto.x == x) & (Parto.y == y)) )
+        return Parto.select().where( (Parto.x <= x+profundo) & (Parto.x >= x-profundo) & (Parto.y <= y+profundo) & (Parto.y >= y-profundo) & ~((Parto.x == x) & (Parto.y == y)) )
     else:
-        return Parto.select().where( (Parto.x <= x+1) & (Parto.x >= x-1) & (Parto.y <= y+1) & (Parto.y >= y-1) & ~((Parto.x == x) & (Parto.y == y)) & (Parto.uzanto == uzanto) )
+        return Parto.select().where( (Parto.x <= x+profundo) & (Parto.x >= x-profundo) & (Parto.y <= y+profundo) & (Parto.y >= y-profundo) & ~((Parto.x == x) & (Parto.y == y)) & (Parto.uzanto == uzanto) )
         
 
 @app.route('/')
@@ -190,7 +189,12 @@ def konstrui(seanco, x, y):
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
     elif parto.uzanto == uzanto and uzanto.mono >= 1:
-        Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
+        if najbaraj_partoj(parto.x, parto.y, uzanto, 2).count() == 24:
+            Parto.update(nivelo=Parto.nivelo+4).where(Parto.x == x, Parto.y == y).execute()
+        elif partoj_uzanto.count() == 8:
+            Parto.update(nivelo=Parto.nivelo+2).where(Parto.x == x, Parto.y == y).execute()
+        else:
+            Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
     elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj_uzanto.count() >= 1 and uzanto.mono >= parto.nivelo+2:

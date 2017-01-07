@@ -65,7 +65,7 @@ body{
     width: 100%;
     border-spacing: 1px;
     font-family: mvzr;
-    font-size: calc(2vh);
+    font-size: calc(2.41vh);
     table-layout:fixed;
     *word-break:break-word;
 }

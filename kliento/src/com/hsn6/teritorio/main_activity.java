@@ -277,6 +277,10 @@ public class main_activity extends Activity
 		.show();
 	    return true;
 	}
+	else if (keyCode == KeyEvent.KEYCODE_MENU){
+	    myWebView.loadUrl("file:///android_asset/ensaluti.html");
+	    return true;
+	}
 	return super.onKeyDown(keyCode, event);
     }
     @JavascriptInterface
