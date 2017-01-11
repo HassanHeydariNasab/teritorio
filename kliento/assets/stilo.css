@@ -135,6 +135,7 @@ label{
     color: #fff;
     text-align: center;
     margin-top: 6vh;
+    margin-bottom: 3vh;
     font-size: calc(4vh + 4vw);
     padding: 10px 0px;
     box-shadow: inset 0 14px 28px rgba(0,0,0,0.25), inset 0 10px 10px rgba(0,0,0,0.22);
@@ -146,10 +147,9 @@ form{
 }
 a{
     text-decoration: none;
-    *line-height: 20vh;
     padding-right: 3vw;
     font-size: calc(2.7vh + 1.8vw);
-    color: #fff;
+    color: #212121;
 }
 #iri{
     background-color: #212121;
