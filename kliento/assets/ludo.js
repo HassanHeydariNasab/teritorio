@@ -3,13 +3,14 @@ if(window.location.toString().match(/android/)){
   //var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 else{
-  var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-  //var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  //var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+  var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 r.res('mapo')
 r.res('vidpunkto')
 r.res('konstrui')
 r.res('ordo')
+r.res('konverti')
 
 var mm
 var cl = console.log
@@ -18,23 +19,66 @@ var malsupru = document.getElementById('malsupru')
 var dekstru = document.getElementById('dekstru')
 var maldekstru = document.getElementById('maldekstru')
 
+function montri(msg){
+  var informo = document.getElementById('informo')
+  informo.innerHTML = msg
+  informo.style.display = 'initial'
+  setTimeout( function(){informo.style.display = 'none'}, 2000 );
+}
+
+function prompti(msg){
+  var prompto = document.getElementById('prompto')
+  prompto.innerHTML = msg
+  prompto.style.display = 'initial'
+  prompto.className = 'montri'
+}
+function kasxi_prompton(){
+  var prompto = document.getElementById('prompto')
+  prompto.className = 'kasxi'
+  setTimeout( function(){prompto.style.display = 'none'}, 1000 );
+}
+function iri(){
+  prompti('<div id="iri">'+
+          '<div id="poz">'+
+          '<label for="x">x:</label>'+
+          '<input name="x" id="x" type="number" />'+
+          '<label for="x">y:</label>'+
+          '<input name="y" id="y" type="number" />'+
+          '</div>'+
+          '<div id="iru" onclick="iru()">برو</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>'+
+          '</div>')
+}
+function montri_konverton(){
+  prompti('<div class="rtl">'
+          + '<div class="titlo">تبدیل هر بلوک طلایی به ۱۰۰ نقره‌ای</div>'+
+          '<label for="oro" class="ora">طلای مصرفی:</label>'
+          + '</div>'+
+          '<input name="oro" id="oro" type="number" />'+
+          '<div id="iru" onclick="konvertu()">تبدیل</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>'+
+           '')
+}
+function konvertu(){
+  r.konverti(window.localStorage.getItem('seanco')+'/'+document.getElementById('oro').value).get().then(function(k){
+    r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
+        xs = x
+        ys = y
+        mm = m
+        mapi(m)
+      })
+    kasxi_prompton()
+    if(k){
+      montri('تبدیل با موفقیت انجام شد.')
+    }
+    else if(!k){
+      montri('تبدیل انجام نشد.')
+    }
+  })
+}
 function persa(cifero){
   return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
 }
 function listi_acxeteblojn(){
-  var informoj = document.getElementById('informoj')
-  var iri = document.getElementById('iri')
-  window.localStorage.setItem('inforomoj', informoj.innerHTML)
-  iri.style.display = 'none'
-  informoj.style.height = 'calc(20vh - 1px)'
-  informoj.innerHTML = '<a href="javascript:Android.acxeti_dialogo(\'blokoj100\')">۱۰۰ بلوک</a>&nbsp;/&nbsp;<a href="javascript:Android.acxeti_dialogo(\'blokoj200\')">۲۰۰ بلوک</a>&nbsp;/&nbsp;<a href="javascript:Android.acxeti_dialogo(\'blokoj500\')">۵۰۰ بلوک</a>&nbsp;/&nbsp;<a href="javascript:Android.acxeti_dialogo(\'blokoj1000\')">۱۰۰۰ بلوک</a><br><a href="javascript:mallisti_acxeteblojn()">بازگشت</a>'
-}
-function mallisti_acxeteblojn(){
-  var informoj = document.getElementById('informoj')
-  var iri = document.getElementById('iri')
-  informoj.innerHTML = window.localStorage.getItem('inforomoj')
-  iri.style.display = ''
-  informoj.style.height = 'calc(10vh - 1px)'
+  prompti('<div class="acxetebla" onclick="Android.acxeti_dialogo(\'blokoj100\')">۱۰۰ بلوک</div><div class="acxetebla" onclick="Android.acxeti_dialogo(\'blokoj200\')">۲۰۰ بلوک</div><div class="acxetebla" onclick="Android.acxeti_dialogo(\'blokoj500\')">۵۰۰ بلوک</div><div class="acxetebla" onklick="Android.acxeti_dialogo(\'blokoj1000\')">۱۰۰۰ بلوک</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>')
 }
 function sendi_ordojn(){
   r.ordo(window.localStorage.getItem('seanco')+'/'+window.localStorage.getItem('ordoj')).get().then(function(k){
@@ -170,16 +214,13 @@ maldekstru.addEventListener('click', function(){
   }
 })
 
-function bloki(mapo, x, y){
-  return mapo[x+':'+y]['nomo']
-}
 function mapi(mapo){
   x = window.localStorage.getItem('x')
   y = window.localStorage.getItem('y')
   var m = document.getElementById('mapo')
   var informoj = document.getElementById('informoj')
   var t = ''
-  var nomo, uzanto, koloro, nivelo, minajxo
+  var nomo, uzanto, koloro, nivelo, minajxo, materialo
   uzanto = mapo['uzanto']
   for (j=+y-2;j<=+y+2;j++){
     t += '<tr>'
@@ -202,7 +243,21 @@ function mapi(mapo){
       catch(e){
         minajxo = ''
       }
-      if(minajxo == 0 || !minajxo){minajxo = '&nbsp;'}else{minajxo = '&rlm;'+persa(minajxo.toString())+' بلوک'}
+      try{
+        materialo = mapo[i+':'+j]['materialo']
+      }
+      catch(e){
+        materialo = ''
+      }
+      if(minajxo == 0 || !minajxo || !materialo){
+        minajxo = '&nbsp;'
+      }
+      else if(materialo == 'argxento'){
+        minajxo = '<div class="argxenta_minajxo">&rlm;'+persa(minajxo.toString())+' بلوک'+'</div>'
+      }
+      else if(materialo == 'oro'){
+        minajxo = '<div class="ora_minajxo">&rlm;'+persa(minajxo.toString())+' بلوک'+'</div>'
+      }
       if (nomo == uzanto){
         koloro = 'nigra'
       }
@@ -223,15 +278,15 @@ function mapi(mapo){
     t += '</tr>'
   }
   m.innerHTML = t
-  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک موجودی / روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک / ' + '<a href="javascript:listi_acxeteblojn()">خرید</a>'
+  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک نقره‌ای / روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک نقره‌ای / ' + '<a href="javascript:listi_acxeteblojn()">خرید</a>' + '<br>' + persa(mapo['oro'].toString())+' بلوک طلایی / روزانه '+ persa(mapo['orogajnanto'].toString()) + ' بلوک طلایی'+' / <a href="javascript:montri_konverton()">تبدیل</a>'+'<br>'+'<a href="javascript:iri()">پرش</a>'
 }
 
 function konstrui(i, j){
   var k = confirm('مطمئنی می‌خوای بسازیش؟')
   if (k){
-    r.konstrui(window.localStorage.getItem('seanco')+'/'+i.toString()+'/'+j.toString()).get().then(function(farita){
-      if(farita){
-        alert('با موفقیت ساخته شد.')
+    r.konstrui(window.localStorage.getItem('seanco')+'/'+i.toString()+'/'+j.toString()).get().then(function(respondo){
+      if(respondo['rezulto']){
+        montri(respondo['informo']+'<br>'+'با هزینهٔ '+persa(respondo['pagita'].toString())+' بلوک')
       }
       else{
         alert('ساخته نشد!')

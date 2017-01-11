@@ -31,6 +31,7 @@ class Uzanto(Model):
     pasvorto = CharField()
     seanco = CharField(max_length=32, null=True)
     mono = IntegerField(default=400)
+    oro = IntegerField(default=7)
     class Meta:
         database = db
 
@@ -39,6 +40,7 @@ class Parto(Model):
     y = IntegerField()
     uzanto = ForeignKeyField(Uzanto, default=1)
     minajxo = IntegerField(default=0)
+    materialo = CharField(null=True)
     nivelo = IntegerField(default=1)
     class Meta:
         database = db
@@ -150,13 +152,16 @@ def mapo(seanco, x, y):
     vidparto = Parto.get(Parto.x == x, Parto.y == y)
     UzantoVidPunkto.update(parto=vidparto).where(UzantoVidPunkto.uzanto == uzanto).execute()
     partoj = Parto.select().where( (Parto.x < x+10) & (Parto.x > x-10) & (Parto.y < y+10) & (Parto.y > y-10) )
-    #, 'kreota':time.mktime(parto.kreota.timetuple())
-    mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'nivelo':parto.nivelo, 'minajxo':parto.minajxo}) for parto in partoj])
+    mapo = dict([(str(parto.x)+':'+str(parto.y), {'nomo':parto.uzanto.nomo, 'nivelo':parto.nivelo, 'minajxo':parto.minajxo, 'materialo':parto.materialo}) for parto in partoj])
     minejoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == uzanto.id))
     gajnanto = 7
+    orogajnanto = 0
     for minejo in minejoj:
-        gajnanto += minejo.nivelo
-    mapo.update({'uzanto':uzanto.nomo, 'mono':uzanto.mono, 'gajnanto':gajnanto})
+        if minejo.materialo == 'argxento':
+            gajnanto += minejo.nivelo
+        elif minejo.materialo == 'oro':
+            orogajnanto += minejo.nivelo
+    mapo.update({'uzanto':uzanto.nomo, 'mono':uzanto.mono, 'oro':uzanto.oro, 'gajnanto':gajnanto, 'orogajnanto':orogajnanto})
     return json.dumps(mapo)
 
 @app.route('/vidpunkto/<seanco>')
@@ -180,32 +185,49 @@ def konstrui(seanco, x, y):
         return json.dumps(False)
     partoj = najbaraj_partoj(parto.x, parto.y)
     partoj_uzanto = najbaraj_partoj(parto.x, parto.y, uzanto)
-    if parto.uzanto.id == 1 and partoj_uzanto.count() == 8 and uzanto.mono >= 1:
-        Parto.update(uzanto=uzanto, nivelo=7).where(Parto.x == x, Parto.y == y).execute()
+    #plibonigado:
+    if parto.uzanto == uzanto and uzanto.mono >= 1:
+        if najbaraj_partoj(parto.x, parto.y, uzanto, 2).count() == 24:
+            Parto.update(nivelo=Parto.nivelo+4).where(Parto.x == x, Parto.y == y).execute()
+            informo = 'ارتقای حصاری دولایه'
+        elif partoj_uzanto.count() == 8:
+            Parto.update(nivelo=Parto.nivelo+2).where(Parto.x == x, Parto.y == y).execute()
+            informo = 'ارتقای حصاری'
+        else:
+            Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
+            informo = 'ارتقای معمولی'
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
-        return json.dumps(True)
+        return json.dumps({'rezulto':True, 'pagita':1, 'informo':informo})
+    #blokado de aliuloj:
+    elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj_uzanto.count() == 8 and uzanto.mono >= parto.nivelo/2+1:
+        Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
+        Uzanto.update(mono=Uzanto.mono-parto.nivelo/2-1).where(Uzanto.seanco == seanco).execute()
+        return json.dumps({'rezulto':True, 'pagita':int(parto.nivelo/2+1), 'informo':'حملهٔ محاصره‌ای'})
+    #kolumna atakado:
+    elif parto.uzanto != uzanto and parto.uzanto.id != 1 and ( Parto.select().where(((Parto.x < parto.x) & (Parto.x > parto.x - 4) & (Parto.y == y)) & (Parto.uzanto == uzanto)).count() == 3 or Parto.select().where( ((Parto.y > parto.y) & (Parto.y < parto.y + 4) & (Parto.x == x)) & (Parto.uzanto == uzanto) ).count() == 3 or Parto.select().where( ((Parto.y < parto.y) & (Parto.y > parto.y - 4) & (Parto.x == x)) & (Parto.uzanto == uzanto) ).count() == 3 or Parto.select().where( ((Parto.x > parto.x) & (Parto.x < parto.x + 4) & (Parto.y == y)) & (Parto.uzanto == uzanto)).count() == 3 ) and uzanto.mono >= (parto.nivelo/2)+1:
+        Parto.update(uzanto=uzanto, nivelo=(Parto.nivelo/2)+1).where(Parto.x == x, Parto.y == y).execute()
+        Uzanto.update(mono=Uzanto.mono-parto.nivelo/4-1).where(Uzanto.seanco == seanco).execute()
+        return json.dumps({'rezulto':True, 'pagita':int(parto.nivelo/4+1), 'informo':'حملهٔ ستونی'})
+    #blokado de naturo:
+    elif parto.uzanto.id == 1 and partoj_uzanto.count() == 8 and uzanto.mono >= 1:
+        Parto.update(uzanto=uzanto, nivelo=7).where(Parto.x == x, Parto.y == y).execute()
+        Uzanto.update(mono=Uzanto.mono-2).where(Uzanto.seanco == seanco).execute()
+        return json.dumps({'rezulto':True, 'pagita':2, 'informo':'تصرف محاصره‌ای'})
+    #simpla gajnado de naturo:
     elif parto.uzanto.id == 1 and partoj_uzanto.count() >= 1 and uzanto.mono >= 1:
         Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
-        return json.dumps(True)
-    elif parto.uzanto == uzanto and uzanto.mono >= 1:
-        if najbaraj_partoj(parto.x, parto.y, uzanto, 2).count() == 24:
-            Parto.update(nivelo=Parto.nivelo+4).where(Parto.x == x, Parto.y == y).execute()
-        elif partoj_uzanto.count() == 8:
-            Parto.update(nivelo=Parto.nivelo+2).where(Parto.x == x, Parto.y == y).execute()
-        else:
-            Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
-        Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
-        return json.dumps(True)
+        return json.dumps({'rezulto':True, 'pagita':1, 'informo':'تصرف معمولی'})
+    #simpla atakado:
     elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj_uzanto.count() >= 1 and uzanto.mono >= parto.nivelo+2:
         Parto.update(uzanto=uzanto, nivelo=(Parto.nivelo/2)+1).where(Parto.x == x, Parto.y == y).execute()
         Uzanto.update(mono=Uzanto.mono-parto.nivelo-2).where(Uzanto.seanco == seanco).execute()
-        return json.dumps(True)
+        return json.dumps({'rezulto':True, 'pagita':parto.nivelo+2, 'informo':'حملهٔ معمولی'})
+    #unua domo:
     elif parto.uzanto.id == 1 and Parto.select().where(Parto.uzanto_id == uzanto.id).count() == 0 and uzanto.mono >= 1:
         Parto.update(uzanto=uzanto).where(Parto.id == parto.id).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.id == uzanto.id).execute()
-        return json.dumps(True)
-    #etaj tekxnikoj:
+        return json.dumps({'rezulto':True, 'pagita':1, 'informo':'نخستین خانه'})
     else:
         return json.dumps(False)
 
@@ -233,3 +255,13 @@ def ordo(seanco, ordoj):
         
     return json.dumps(True)
     
+@app.route("/konverti/<seanco>/<oro>")
+def konverti(seanco, oro):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    oro = int(oro)
+    if uzanto.oro < oro or oro <= 0:
+        return json.dumps(False)
+    else:
+        Uzanto.update(mono=Uzanto.mono+oro*100, oro=Uzanto.oro-oro).where(Uzanto.seanco == seanco).execute()
+        return json.dumps(True)
