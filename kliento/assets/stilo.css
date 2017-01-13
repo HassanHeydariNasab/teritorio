@@ -92,10 +92,18 @@ td{
 #informoj{
     background-color: #212121;
     color: white;
-    height: 20vh;
+    height: 12vh;
     width: 100%;
-    padding-top: 2.5vh;
     line-height: 5vh;
+    text-align: center;
+    font-size: calc(1.3vh + 2.4vw);
+    direction: rtl;
+}
+#agoj{
+    background-color: #212121;
+    *color: white;
+    height: 8vh;
+    width: 100%;
     text-align: center;
     font-size: calc(1.3vh + 2.4vw);
     direction: rtl;
@@ -342,4 +350,19 @@ input#oro{
 }
 .ora{
     color:#FDD835;
+}
+.baskulebla{
+    border: 2px solid #FFB300;
+    color: #fff;
+    border-radius: 12px;
+    padding: 1vh !important;
+    margin-right: 3vw;
+}
+#saltu{
+    background-color: green;
+    color: #fff;
+    border-radius: 5px;
+    padding: 1vh 3vw !important;
+    margin-right: 3vw;
+    margin-left: 1vw;
 }

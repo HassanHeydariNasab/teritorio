@@ -6,6 +6,7 @@ from playhouse.pool import *
 from bottle import Bottle, request, response, hook
 from urllib.parse import urlparse
 from urllib.request import urlopen
+from random import sample, randrange, randint, choice
 
 if 'OPENSHIFT_DATA_DIR' in os.environ:
     #db = SqliteDatabase(os.environ['OPENSHIFT_DATA_DIR']+'datumaro.db')
@@ -40,7 +41,7 @@ class Parto(Model):
     y = IntegerField()
     uzanto = ForeignKeyField(Uzanto, default=1)
     minajxo = IntegerField(default=0)
-    materialo = CharField(null=True)
+    materialo = CharField(default='nenia')
     nivelo = IntegerField(default=1)
     class Meta:
         database = db
@@ -97,7 +98,7 @@ def najbaraj_partoj(x, y, uzanto=False, profundo=1):
 def index():
     return "<b>cxefa</b> pagxo"
 
-@app.get("/testo")
+@app.route("/testo")
 def testo():
     response.content_type = "application/json; charset=utf-8"
     return json.dumps("test!")
@@ -228,6 +229,31 @@ def konstrui(seanco, x, y):
         Parto.update(uzanto=uzanto).where(Parto.id == parto.id).execute()
         Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.id == uzanto.id).execute()
         return json.dumps({'rezulto':True, 'pagita':1, 'informo':'نخستین خانه'})
+    else:
+        return json.dumps(False)
+
+@app.route("/eksplodi/<seanco>/<x>/<y>")
+def eksplodi(seanco, x, y):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    try:
+        parto = Parto.get(Parto.x == x, Parto.y == y, Parto.uzanto == uzanto)
+    except Parto.DoesNotExist:
+        return json.dumps(False)
+    x = int(x)
+    y = int(y)
+    np = najbaraj_partoj(x, y, 1)
+    npc = np.count()
+    if npc > 5:
+        npc = 5
+    if parto.nivelo >= 2:
+        Parto.update(uzanto=1, nivelo=1).where(Parto.x == x, Parto.y == y).execute()
+        Parto.update(nivelo=Parto.nivelo/5+1).where(najbaraj_partoj(x, y)).execute()
+        Parto.update(materialo='argxento', minajxo=Parto.minajxo+40).where((Parto.id << sample(list(np), randrange(npc))) & ~(Parto.materialo >> 'oro')).execute()
+        if randint(0, 1) == 1:
+            print(11111111)
+            Parto.update(materialo='oro', minajxo=Parto.minajxo+40).where((Parto.id == choice(np).id) & ~(Parto.materialo >> 'argxento')).execute()
+        return json.dumps({'rezulto':True, 'pagita':0, 'informo':'انفجار'})
     else:
         return json.dumps(False)
 

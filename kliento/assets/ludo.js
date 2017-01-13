@@ -1,14 +1,16 @@
 if(window.location.toString().match(/android/)){
-  var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
-  //var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  //var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
+  var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 else{
-  //var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-  var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  var r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+  //var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 r.res('mapo')
 r.res('vidpunkto')
 r.res('konstrui')
+r.res('eksplodi')
+r.res('defendi')
 r.res('ordo')
 r.res('konverti')
 
@@ -73,6 +75,43 @@ function konvertu(){
       montri('تبدیل انجام نشد.')
     }
   })
+}
+aktivi_konstruadon()
+function aktivi_konstruadon(){
+  window.localStorage.setItem('ago', 'konstruado')
+  var konstruado = document.getElementById('konstruado')
+  var eksplodado = document.getElementById('eksplodado')
+  var defendado = document.getElementById('defendado')
+  konstruado.style.backgroundColor = '#FFB300'
+  konstruado.style.color = '#212121'
+  eksplodado.style.backgroundColor = ''
+  eksplodado.style.color = '#fff'
+  defendado.style.backgroundColor = ''
+  defendado.style.color = '#fff'
+}
+function aktivi_eksplodadon(){
+  window.localStorage.setItem('ago', 'eksplodado')
+  var konstruado = document.getElementById('konstruado')
+  var eksplodado = document.getElementById('eksplodado')
+  var defendado = document.getElementById('defendado')
+  eksplodado.style.backgroundColor = '#FFB300'
+  eksplodado.style.color = '#212121'
+  konstruado.style.backgroundColor = ''
+  konstruado.style.color = '#fff'
+  defendado.style.backgroundColor = ''
+  defendado.style.color = '#fff'
+}
+function aktivi_defendadon(){
+  window.localStorage.setItem('ago', 'defendado')
+  var konstruado = document.getElementById('konstruado')
+  var eksplodado = document.getElementById('eksplodado')
+  var defendado = document.getElementById('defendado')
+  defendado.style.backgroundColor = '#FFB300'
+  defendado.style.color = '#212121'
+  eksplodado.style.backgroundColor = ''
+  eksplodado.style.color = '#fff'
+  konstruado.style.backgroundColor = ''
+  konstruado.style.color = '#fff'
 }
 function persa(cifero){
   return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
@@ -249,7 +288,7 @@ function mapi(mapo){
       catch(e){
         materialo = ''
       }
-      if(minajxo == 0 || !minajxo || !materialo){
+      if(minajxo == 0 || !minajxo || materialo == 'nenia' || !materialo){
         minajxo = '&nbsp;'
       }
       else if(materialo == 'argxento'){
@@ -273,14 +312,29 @@ function mapi(mapo){
         koloro = 'griza'
       }
       if(nivelo){nivelo = 'سطح ' + persa(nivelo.toString())}else{nivelo = '&nbsp;'}
-      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=konstrui('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+persa(i.toString())+':'+persa(j.toString())+'<br>'+nivelo+'<br>'+minajxo+'</td>'
+      t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=agi('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+persa(i.toString())+':'+persa(j.toString())+'<br>'+nivelo+'<br>'+minajxo+'</td>'
     }
     t += '</tr>'
   }
   m.innerHTML = t
-  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک نقره‌ای / روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک نقره‌ای / ' + '<a href="javascript:listi_acxeteblojn()">خرید</a>' + '<br>' + persa(mapo['oro'].toString())+' بلوک طلایی / روزانه '+ persa(mapo['orogajnanto'].toString()) + ' بلوک طلایی'+' / <a href="javascript:montri_konverton()">تبدیل</a>'+'<br>'+'<a href="javascript:iri()">پرش</a>'
+  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک نقره‌ای / روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک نقره‌ای / ' + '<a href="javascript:listi_acxeteblojn()">خرید</a>' + '<br>' + persa(mapo['oro'].toString())+' بلوک طلایی / روزانه '+ persa(mapo['orogajnanto'].toString()) + ' بلوک طلایی'+' / <a href="javascript:montri_konverton()">تبدیل</a>'
 }
-
+function agi(i, j){
+  var ago = window.localStorage.getItem('ago')
+  if (!(ago)){
+    window.localStorage.setItem('ago', 'konstruado')
+    ago = 'konstruado'
+  }
+  if(ago == 'konstruado'){
+    konstrui(i, j)
+  }
+  else if(ago == 'eksplodado'){
+    eksplodi(i, j)
+  }
+  else if(ago == 'defendado'){
+    defendi(i, j)
+  }
+}
 function konstrui(i, j){
   var k = confirm('مطمئنی می‌خوای بسازیش؟')
   if (k){
@@ -290,6 +344,25 @@ function konstrui(i, j){
       }
       else{
         alert('ساخته نشد!')
+      }
+      r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
+        xs = x
+        ys = y
+        mm = m
+        mapi(m)
+      })
+    })
+  }
+}
+function eksplodi(i, j){
+  var k = confirm('مطمئنی می‌خوای منفجرش کنی؟')
+  if (k){
+    r.eksplodi(window.localStorage.getItem('seanco')+'/'+i.toString()+'/'+j.toString()).get().then(function(respondo){
+      if(respondo['rezulto']){
+        montri(respondo['informo']+'<br>'+'با هزینهٔ '+persa(respondo['pagita'].toString())+' بلوک')
+      }
+      else{
+        alert('منفجر نشد!')
       }
       r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
         xs = x
