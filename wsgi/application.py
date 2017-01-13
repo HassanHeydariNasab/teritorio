@@ -248,7 +248,7 @@ def eksplodi(seanco, x, y):
         npc = 5
     if parto.nivelo >= 2:
         Parto.update(uzanto=1, nivelo=1).where(Parto.x == x, Parto.y == y).execute()
-        Parto.update(nivelo=Parto.nivelo/5+1).where(najbaraj_partoj(x, y)).execute()
+        Parto.update(nivelo=Parto.nivelo/5+1).where(Parto.id << najbaraj_partoj(x, y)).execute()
         Parto.update(materialo='argxento', minajxo=Parto.minajxo+40).where((Parto.id << sample(list(np), randrange(npc))) & ~(Parto.materialo >> 'oro')).execute()
         if randint(0, 1) == 1:
             print(11111111)
