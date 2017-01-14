@@ -52,7 +52,7 @@ function iri(){
 }
 function montri_konverton(){
   prompti('<div class="rtl">'
-          + '<div class="titlo">تبدیل هر بلوک طلایی به ۱۰۰ نقره‌ای</div>'+
+          + '<div class="titlo">تبدیل هر بلوک طلایی به ۴۰ نقره‌ای</div>'+
           '<label for="oro" class="ora">طلای مصرفی:</label>'
           + '</div>'+
           '<input name="oro" id="oro" type="number" />'+
@@ -259,7 +259,7 @@ function mapi(mapo){
   var m = document.getElementById('mapo')
   var informoj = document.getElementById('informoj')
   var t = ''
-  var nomo, uzanto, koloro, nivelo, minajxo, materialo
+  var nomo, uzanto, koloro, nivelo, minajxo, materialo, murita
   uzanto = mapo['uzanto']
   for (j=+y-2;j<=+y+2;j++){
     t += '<tr>'
@@ -288,6 +288,12 @@ function mapi(mapo){
       catch(e){
         materialo = ''
       }
+      try{
+        murita = mapo[i+':'+j]['murita']
+      }
+      catch(e){
+        murita = false
+      }
       if(minajxo == 0 || !minajxo || materialo == 'nenia' || !materialo){
         minajxo = '&nbsp;'
       }
@@ -310,6 +316,9 @@ function mapi(mapo){
       }
       else{
         koloro = 'griza'
+      }
+      if (murita){
+        koloro += ' muro'
       }
       if(nivelo){nivelo = 'سطح ' + persa(nivelo.toString())}else{nivelo = '&nbsp;'}
       t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=agi('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+persa(i.toString())+':'+persa(j.toString())+'<br>'+nivelo+'<br>'+minajxo+'</td>'
@@ -363,6 +372,25 @@ function eksplodi(i, j){
       }
       else{
         alert('منفجر نشد!')
+      }
+      r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
+        xs = x
+        ys = y
+        mm = m
+        mapi(m)
+      })
+    })
+  }
+}
+function defendi(i, j){
+  var k = confirm('مطمئنی می‌خوای دیوارش کنی؟')
+  if (k){
+    r.defendi(window.localStorage.getItem('seanco')+'/'+i.toString()+'/'+j.toString()).get().then(function(respondo){
+      if(respondo['rezulto']){
+        montri(respondo['informo']+'<br>'+'با هزینهٔ '+persa(respondo['pagita'].toString())+' بلوک')
+      }
+      else{
+        alert('دیوار نشد!')
       }
       r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
         xs = x

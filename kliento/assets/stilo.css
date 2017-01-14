@@ -366,3 +366,9 @@ input#oro{
     margin-right: 3vw;
     margin-left: 1vw;
 }
+.muro{
+    background-image: url('muro.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
