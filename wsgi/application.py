@@ -220,8 +220,8 @@ def konstrui(seanco, x, y):
             else:
                 Parto.update(nivelo=Parto.nivelo+1).where(Parto.x == x, Parto.y == y).execute()
                 informo = 'ارتقای معمولی'
-                Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
-                return json.dumps({'rezulto':True, 'pagita':1, 'informo':informo})
+            Uzanto.update(mono=Uzanto.mono-1).where(Uzanto.seanco == seanco).execute()
+            return json.dumps({'rezulto':True, 'pagita':1, 'informo':informo})
         #blokado de aliuloj:
         elif parto.uzanto != uzanto and parto.uzanto.id != 1 and partoj_uzanto.count() == 8 and uzanto.mono >= parto.nivelo/2+1:
             Parto.update(uzanto=uzanto).where(Parto.x == x, Parto.y == y).execute()
