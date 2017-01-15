@@ -13,6 +13,7 @@ r.res('eksplodi')
 r.res('defendi')
 r.res('ordo')
 r.res('konverti')
+r.res('origi')
 
 var mm
 var cl = console.log
@@ -53,7 +54,7 @@ function iri(){
 function montri_konverton(){
   prompti('<div class="rtl">'
           + '<div class="titlo">تبدیل هر بلوک طلایی به ۴۰ نقره‌ای</div>'+
-          '<label for="oro" class="ora">طلای مصرفی:</label>'
+          '<label for="oro">طلای مصرفی:</label>'
           + '</div>'+
           '<input name="oro" id="oro" type="number" />'+
           '<div id="iru" onclick="konvertu()">تبدیل</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>'+
@@ -82,36 +83,60 @@ function aktivi_konstruadon(){
   var konstruado = document.getElementById('konstruado')
   var eksplodado = document.getElementById('eksplodado')
   var defendado = document.getElementById('defendado')
+  var origado = document.getElementById('origado')
   konstruado.style.backgroundColor = '#FFB300'
   konstruado.style.color = '#212121'
   eksplodado.style.backgroundColor = ''
   eksplodado.style.color = '#fff'
   defendado.style.backgroundColor = ''
   defendado.style.color = '#fff'
+  origado.style.backgroundColor = ''
+  origado.style.color = '#fff'
 }
 function aktivi_eksplodadon(){
   window.localStorage.setItem('ago', 'eksplodado')
   var konstruado = document.getElementById('konstruado')
   var eksplodado = document.getElementById('eksplodado')
   var defendado = document.getElementById('defendado')
+  var origado = document.getElementById('origado')
   eksplodado.style.backgroundColor = '#FFB300'
   eksplodado.style.color = '#212121'
   konstruado.style.backgroundColor = ''
   konstruado.style.color = '#fff'
   defendado.style.backgroundColor = ''
   defendado.style.color = '#fff'
+  origado.style.backgroundColor = ''
+  origado.style.color = '#fff'
 }
 function aktivi_defendadon(){
   window.localStorage.setItem('ago', 'defendado')
   var konstruado = document.getElementById('konstruado')
   var eksplodado = document.getElementById('eksplodado')
   var defendado = document.getElementById('defendado')
+  var origado = document.getElementById('origado')
   defendado.style.backgroundColor = '#FFB300'
   defendado.style.color = '#212121'
   eksplodado.style.backgroundColor = ''
   eksplodado.style.color = '#fff'
   konstruado.style.backgroundColor = ''
   konstruado.style.color = '#fff'
+  origado.style.backgroundColor = ''
+  origado.style.color = '#fff'
+}
+function aktivi_origadon(){
+  window.localStorage.setItem('ago', 'origado')
+  var konstruado = document.getElementById('konstruado')
+  var eksplodado = document.getElementById('eksplodado')
+  var defendado = document.getElementById('defendado')
+  var origado = document.getElementById('origado')
+  origado.style.backgroundColor = '#FFB300'
+  origado.style.color = '#212121'
+  eksplodado.style.backgroundColor = ''
+  eksplodado.style.color = '#fff'
+  konstruado.style.backgroundColor = ''
+  konstruado.style.color = '#fff'
+  defendado.style.backgroundColor = ''
+  defendado.style.color = '#fff'
 }
 function persa(cifero){
   return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
@@ -259,7 +284,7 @@ function mapi(mapo){
   var m = document.getElementById('mapo')
   var informoj = document.getElementById('informoj')
   var t = ''
-  var nomo, uzanto, koloro, nivelo, minajxo, materialo, murita
+  var nomo, uzanto, koloro, nivelo, minajxo, materialo, murita, orita
   uzanto = mapo['uzanto']
   for (j=+y-2;j<=+y+2;j++){
     t += '<tr>'
@@ -294,6 +319,12 @@ function mapi(mapo){
       catch(e){
         murita = false
       }
+      try{
+        orita = mapo[i+':'+j]['orita']
+      }
+      catch(e){
+        orita = false
+      }
       if(minajxo == 0 || !minajxo || materialo == 'nenia' || !materialo){
         minajxo = '&nbsp;'
       }
@@ -320,6 +351,9 @@ function mapi(mapo){
       if (murita){
         koloro += ' muro'
       }
+      if (orita){
+        koloro += ' ora'
+      }
       if(nivelo){nivelo = 'سطح ' + persa(nivelo.toString())}else{nivelo = '&nbsp;'}
       t+='<td'+' id="'+i.toString()+'_'+j.toString()+'" class="'+koloro+'" onclick=agi('+i.toString()+','+j.toString()+') >'+nomo+'<br>'+persa(i.toString())+':'+persa(j.toString())+'<br>'+nivelo+'<br>'+minajxo+'</td>'
     }
@@ -342,6 +376,9 @@ function agi(i, j){
   }
   else if(ago == 'defendado'){
     defendi(i, j)
+  }
+  else if(ago == 'origado'){
+    origi(i, j)
   }
 }
 function konstrui(i, j){
@@ -391,6 +428,25 @@ function defendi(i, j){
       }
       else{
         alert('دیوار نشد!')
+      }
+      r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
+        xs = x
+        ys = y
+        mm = m
+        mapi(m)
+      })
+    })
+  }
+}
+function origi(i, j){
+  var k = confirm('مطمئنی می‌خوای گنجیه بشه؟')
+  if (k){
+    r.origi(window.localStorage.getItem('seanco')+'/'+i.toString()+'/'+j.toString()).get().then(function(respondo){
+      if(respondo['rezulto']){
+        montri(respondo['informo']+'<br>'+'با هزینهٔ '+persa(respondo['pagita'].toString())+' بلوک طلایی')
+      }
+      else{
+        alert('گنجینه نشد!')
       }
       r.mapo(window.localStorage.getItem('seanco')+'/'+x+'/'+y).get().then(function(m){
         xs = x
