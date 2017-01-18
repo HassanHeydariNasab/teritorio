@@ -239,7 +239,7 @@ def konstrui(seanco, x, y):
                 Uzanto.update(mono=Uzanto.mono-parto.nivelo/4-1).where(Uzanto.seanco == seanco).execute()
             return json.dumps({'rezulto':True, 'pagita':int(parto.nivelo/4+1), 'informo':'حملهٔ ستونی'})
         #blokado de naturo:
-        elif parto.uzanto.id == 1 and najbaraj_partoj_uzanto.count() == 8 and uzanto.mono >= 1:
+        elif parto.uzanto.id == 1 and najbaraj_partoj_uzanto.count() == 8 and uzanto.mono >= 2:
             Parto.update(uzanto=uzanto, nivelo=7).where(Parto.id == parto.id).execute()
             Uzanto.update(mono=Uzanto.mono-2).where(Uzanto.seanco == seanco).execute()
             return json.dumps({'rezulto':True, 'pagita':2, 'informo':'تصرف محاصره‌ای'})

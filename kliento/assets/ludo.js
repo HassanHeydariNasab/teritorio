@@ -51,6 +51,12 @@ function iri(){
           '<div id="iru" onclick="iru()">برو</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>'+
           '</div>')
 }
+function montri_menuon(){
+  prompti('<div class="menuano" onclick="javascript:iri()">پرش</div>'
+          + '<div class="menuano" onclick="javascript:montri_helpanton()">راهنما</div>'
+          + ''
+          + '<div id="fermu" onclick="kasxi_prompton()">بستن</div>')
+}
 function montri_konverton(){
   prompti('<div class="rtl">'
           + '<div class="titlo">تبدیل هر بلوک طلایی به ۴۰ نقره‌ای</div>'+
@@ -59,6 +65,10 @@ function montri_konverton(){
           '<input name="oro" id="oro" type="number" />'+
           '<div id="iru" onclick="konvertu()">تبدیل</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>'+
            '')
+}
+function montri_helpanton(){
+  prompti('<iframe src="i.html"></iframe>'
+          + '<div id="fermu" onclick="kasxi_prompton()">بستن</div>')
 }
 function konvertu(){
   r.konverti(window.localStorage.getItem('seanco')+'/'+document.getElementById('oro').value).get().then(function(k){
@@ -360,7 +370,7 @@ function mapi(mapo){
     t += '</tr>'
   }
   m.innerHTML = t
-  informoj.innerHTML = persa(mapo['mono'].toString()) +' بلوک نقره‌ای / روزانه '+ persa(mapo['gajnanto'].toString()) + ' بلوک نقره‌ای / ' + '<a href="javascript:listi_acxeteblojn()">خرید</a>' + '<br>' + persa(mapo['oro'].toString())+' بلوک طلایی / روزانه '+ persa(mapo['orogajnanto'].toString()) + ' بلوک طلایی'+' / <a href="javascript:montri_konverton()">تبدیل</a>'
+  informoj.innerHTML = '<span id="argxento_informo">'+' ('+persa(mapo['gajnanto'].toString())+'+) '+persa(mapo['mono'].toString())+'<a id="acxetu" class="enlinia_btn" href="javascript:listi_acxeteblojn()">خرید</a>' + '</span><span id="oro_informo">' +' ('+ persa(mapo['orogajnanto'].toString()) +'+) '+persa(mapo['oro'].toString())+'<a id="konvertu" class="enlinia_btn" href="javascript:montri_konverton()">تبدیل</a></span>'
 }
 function agi(i, j){
   var ago = window.localStorage.getItem('ago')

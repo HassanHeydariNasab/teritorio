@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -9,378 +10,78 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   viewBox="0 0 64.000001 64.000001"
    id="svg2"
-   width="100"
-   version="1.0"
-   height="100"
+   version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="muro.svg">
+  <defs
+     id="defs4" />
   <sodipodi:namedview
+     id="base"
      pagecolor="#ffffff"
      bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
+     inkscape:zoom="5.6"
+     inkscape:cx="46.029652"
+     inkscape:cy="24.027138"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
      inkscape:window-width="1024"
      inkscape:window-height="744"
-     id="namedview22"
-     showgrid="false"
-     inkscape:zoom="4.72"
-     inkscape:cx="58.744948"
-     inkscape:cy="50.740819"
      inkscape:window-x="0"
      inkscape:window-y="24"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg2" />
+     inkscape:window-maximized="1" />
   <metadata
-     id="metadata4">
+     id="metadata7">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
-        <dc:title />
-        <dc:description />
-        <dc:subject>
-          <rdf:Bag>
-            <rdf:li>pattern</rdf:li>
-          </rdf:Bag>
-        </dc:subject>
-        <dc:publisher>
-          <cc:Agent
-             rdf:about="http://www.openclipart.org">
-            <dc:title>Open Clip Art Library</dc:title>
-          </cc:Agent>
-        </dc:publisher>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Alan Horkan</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:rights>
-          <cc:Agent>
-            <dc:title>Alan Horkan</dc:title>
-          </cc:Agent>
-        </dc:rights>
-        <dc:date />
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <cc:license
-           rdf:resource="http://web.resource.org/cc/PublicDomain" />
-        <dc:language>en</dc:language>
+        <dc:title></dc:title>
       </cc:Work>
-      <cc:License
-         rdf:about="http://web.resource.org/cc/PublicDomain">
-        <cc:permits
-           rdf:resource="http://web.resource.org/cc/Reproduction" />
-        <cc:permits
-           rdf:resource="http://web.resource.org/cc/Distribution" />
-        <cc:permits
-           rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
-      </cc:License>
     </rdf:RDF>
   </metadata>
-  <defs
-     id="defs6">
-    <linearGradient
-       id="linearGradient4870"
-       osb:paint="solid">
-      <stop
-         style="stop-color:#000000;stop-opacity:1;"
-         offset="0"
-         id="stop4872" />
-    </linearGradient>
-    <pattern
-       width="80"
-       patternUnits="userSpaceOnUse"
-       patternContentUnits="userSpaceOnUse"
-       id="parquet-3"
-       height="80">
-      <rect
-         y="0"
-         x="0"
-         width="20"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         id="top-left"
-         height="40"
-         fill="#ff4040" />
-      <rect
-         id="rect10"
-         y="80"
-         x="80"
-         width="20"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="40"
-         fill="#ff4040" />
-      <rect
-         id="rect12"
-         y="0"
-         x="20"
-         width="40"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="20"
-         fill="#ff4040" />
-      <rect
-         id="rect14"
-         y="20"
-         x="20"
-         width="20"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="40"
-         fill="#ff4040" />
-      <rect
-         id="rect16"
-         y="20"
-         x="40"
-         width="40"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="20"
-         fill="#ff4040" />
-      <rect
-         id="rect18"
-         y="40"
-         x="40"
-         width="20"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="40"
-         fill="#ff4040" />
-      <rect
-         id="rect20"
-         y="40"
-         x="60"
-         width="40"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="20"
-         fill="#ff4040" />
-      <rect
-         id="rect22"
-         y="60"
-         x="60"
-         width="20"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="40"
-         fill="#ff4040" />
-      <rect
-         id="rect24"
-         y="60"
-         x="80"
-         width="40"
-         transform="matrix(1 0 0 1 0 0)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="20"
-         fill="#ff4040" />
-      <rect
-         id="rect26"
-         y="0"
-         x="20"
-         width="40"
-         transform="matrix(1 0 0 1 -40 40)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="20"
-         fill="#ff4040" />
-      <rect
-         id="rect28"
-         y="20"
-         x="40"
-         width="40"
-         transform="matrix(1 0 0 1 -40 40)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="20"
-         fill="#ff4040" />
-      <rect
-         id="rect30"
-         y="40"
-         x="40"
-         width="20"
-         transform="matrix(1 0 0 1 -40 40)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="40"
-         fill="#ff4040" />
-      <rect
-         id="rect32"
-         y="40"
-         x="60"
-         width="40"
-         transform="matrix(1 0 0 1 -40 40)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="20"
-         fill="#ff4040" />
-      <rect
-         id="rect34"
-         y="0"
-         x="0"
-         width="20"
-         transform="matrix(1 0 0 1 60 -20)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="40"
-         fill="#ff4040" />
-      <rect
-         id="rect36"
-         y="20"
-         x="20"
-         width="20"
-         transform="matrix(1 0 0 1 60 -20)"
-         stroke-width="2"
-         stroke="#ffc080"
-         height="40"
-         fill="#ff4040" />
-    </pattern>
-  </defs>
-  <rect
-     style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#c69463;fill-opacity:0.32911393;fill-rule:nonzero;stroke:#000000;stroke-width:0.53936636;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.4556962;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-     id="rect5599"
-     width="16.34354"
-     height="34.555302"
-     x="1.827351"
-     y="2.6809294"
-     ry="2.502959" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#rect5599"
-     id="use5603"
-     transform="translate(20,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5603"
-     id="use5605"
-     transform="translate(20,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5605"
-     id="use5607"
-     transform="translate(20,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5607"
-     id="use5609"
-     transform="translate(20,-60)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5609"
-     id="use5611"
-     transform="matrix(0,1,-1,0,59.912868,-79.995296)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5611"
-     id="use5613"
-     transform="translate(20,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5613"
-     id="use5615"
-     transform="translate(20,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5615"
-     id="use5617"
-     transform="translate(-60,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5617"
-     id="use5619"
-     transform="translate(20,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5617"
-     id="use5621"
-     transform="matrix(0.49896188,0,0,1,-0.47630612,-20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5621"
-     id="use5623"
-     transform="matrix(0,1,-1,0,60.013608,81.013638)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5621"
-     id="use5625"
-     transform="translate(81.015444,20)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5623"
-     id="use5627"
-     transform="translate(80,0)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
-  <use
-     x="0"
-     y="0"
-     xlink:href="#use5627"
-     id="use5629"
-     transform="translate(-20,-80.967161)"
-     width="100%"
-     height="100%"
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:0.75949365;opacity:1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-988.36216)">
+    <path
+       transform="scale(1,-1)"
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:0.5;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       d="m 8.6850319,-1010.268 0,-30.2014 46.6299361,0 0,30.2014"
+       id="rect4136"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="opacity:0.5;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 32,1052.3622 0,-8.3928"
+       id="path4164"
+       inkscape:connector-curvature="0" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#path4164"
+       id="use4172"
+       transform="matrix(0,-1,0.61776754,0,-586.1152,1052.3686)"
+       width="100%"
+       height="100%" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use4172"
+       id="use4174"
+       transform="translate(-58.815192,0)"
+       width="100%"
+       height="100%" />
+  </g>
 </svg>
