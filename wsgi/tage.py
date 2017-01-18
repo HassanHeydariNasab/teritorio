@@ -19,4 +19,6 @@ for parto in partoj:
         parto.minajxo = 0
     parto.save()
 
+Uzanto.update(oro=40).where(Uzanto.oro > 40).execute()
+
 db.close()

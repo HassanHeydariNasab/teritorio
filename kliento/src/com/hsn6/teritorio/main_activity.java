@@ -105,12 +105,14 @@ public class main_activity extends Activity
 	});
 	myWebView.setLongClickable(false);
 	// disable scroll on touch
+	/*
 	myWebView.setOnTouchListener(new View.OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 		    return (event.getAction() == MotionEvent.ACTION_MOVE);
 		}
 	    });
+	*/
 	//myWebView.setVerticalScrollBarEnabled(false);
 	myWebView.setHorizontalScrollBarEnabled(false);
 	if(isPackageExisted("com.farsitel.bazaar")){
