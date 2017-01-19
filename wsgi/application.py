@@ -7,6 +7,7 @@ from bottle import Bottle, request, response, hook
 from urllib.parse import urlparse
 from urllib.request import urlopen
 from random import sample, randrange, randint, choice
+from collections import Counter
 
 if 'OPENSHIFT_DATA_DIR' in os.environ:
     #db = SqliteDatabase(os.environ['OPENSHIFT_DATA_DIR']+'datumaro.db')
@@ -340,6 +341,17 @@ def statistiko(seanco):
         return json.dumps({'argxentaj':argxentaj, 'oraj':oraj, 'muroj':muroj, 'uzantoj':uzantoj})
     else:
         return json.dumps({'argxentaj':argxentaj, 'oraj':oraj, 'muroj':muroj})
+
+@app.route("/rango/<seanco>")
+def rango(seanco):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    uzantoj = Uzanto.select().join(Parto).where(Parto.orita == True)
+    uzantoj_ripetitaj = Counter(uzantoj).most_common()
+    sep_unuaj = {}
+    for (uzanto_ripetita, i) in zip(uzantoj_ripetitaj[:7], range(0,7)):
+        sep_unuaj[str(i)] = (uzanto_ripetita[0].nomo, str(uzanto_ripetita[1]))
+    return json.dumps(sep_unuaj)
 
 @app.route('/ordo/<seanco>/<ordoj>')
 def ordo(seanco, ordoj):

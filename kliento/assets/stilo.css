@@ -448,3 +448,6 @@ iframe{
     font-size: 6vw;
     padding-right: 3vw;
 }
+#statistiko > table{
+    width: 100%;
+}

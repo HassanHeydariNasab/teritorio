@@ -15,6 +15,7 @@ r.res('ordo')
 r.res('konverti')
 r.res('origi')
 r.res('statistiko')
+r.res('rango')
 
 var mm
 var cl = console.log
@@ -55,6 +56,7 @@ function iri(){
 function montri_menuon(){
   prompti('<div class="menuano" onclick="javascript:iri()">پرش</div>'
           + '<div class="menuano" onclick="javascript:montri_statistikon()">آمار</div>'
+          + '<div class="menuano" onclick="javascript:montri_rangon()">بهترین‌ها</div>'
           + '<div class="menuano" onclick="javascript:montri_helpanton()">راهنما</div>'
           + '<div id="fermu" onclick="kasxi_prompton()">بستن</div>')
 }
@@ -76,6 +78,18 @@ function montri_statistikon(){
       uzantoj = ''
     }
     prompti('<div id="statistiko">'+persa(k['argxentaj'].toString())+' خانهٔ معمولی'+'<br>'+persa(k['oraj'].toString())+' خانهٔ طلایی'+'<br>'+persa(k['muroj'].toString())+' دیوار'+'<br>'+uzantoj+'</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>')
+  })
+}
+function montri_rangon(){
+  r.rango(window.localStorage.getItem('seanco')).get().then(function(k){
+    rangoj = '<table><tr><td>رتبه</td><td>بازیکن</td><td>خانهٔ طلایی</td>'
+    for (i=0;i<7;i++){
+      try{
+        rangoj += '<tr><td>'+persa((i+1).toString())+'</td><td>'+k[i.toString()][0]+'</td><td>'+persa(k[i.toString()][1])+'</td></tr>'
+      }
+      catch(e){}
+    }
+    prompti('<div id="statistiko">'+rangoj+'</table></div><div id="fermu" onclick="kasxi_prompton()">بستن</div>')
   })
 }
 function montri_helpanton(){
