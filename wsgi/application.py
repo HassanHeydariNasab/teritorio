@@ -328,6 +328,19 @@ def origi(seanco, x, y):
     uzanto.save()
     return json.dumps({'rezulto':True, 'pagita':1, 'informo':'خانهٔ طلایی'})
 
+@app.route("/statistiko/<seanco>")
+def statistiko(seanco):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    argxentaj = Parto.select().where(Parto.uzanto == uzanto.id, Parto.orita == False).count()
+    oraj = Parto.select().where(Parto.uzanto == uzanto.id, Parto.orita == True).count()
+    muroj = Parto.select().where(Parto.uzanto == uzanto.id, Parto.murita == True).count()
+    if uzanto.nomo == 'hsn6':
+        uzantoj = Uzanto.select().count()
+        return json.dumps({'argxentaj':argxentaj, 'oraj':oraj, 'muroj':muroj, 'uzantoj':uzantoj})
+    else:
+        return json.dumps({'argxentaj':argxentaj, 'oraj':oraj, 'muroj':muroj})
+
 @app.route('/ordo/<seanco>/<ordoj>')
 def ordo(seanco, ordoj):
     response.content_type = "application/json; charset=utf-8"

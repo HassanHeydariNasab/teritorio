@@ -14,6 +14,7 @@ r.res('defendi')
 r.res('ordo')
 r.res('konverti')
 r.res('origi')
+r.res('statistiko')
 
 var mm
 var cl = console.log
@@ -53,8 +54,8 @@ function iri(){
 }
 function montri_menuon(){
   prompti('<div class="menuano" onclick="javascript:iri()">پرش</div>'
+          + '<div class="menuano" onclick="javascript:montri_statistikon()">آمار</div>'
           + '<div class="menuano" onclick="javascript:montri_helpanton()">راهنما</div>'
-          + ''
           + '<div id="fermu" onclick="kasxi_prompton()">بستن</div>')
 }
 function montri_konverton(){
@@ -65,6 +66,17 @@ function montri_konverton(){
           '<input name="oro" id="oro" type="number" />'+
           '<div id="iru" onclick="konvertu()">تبدیل</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>'+
            '')
+}
+function montri_statistikon(){
+  r.statistiko(window.localStorage.getItem('seanco')).get().then(function(k){
+    try{
+      uzantoj = persa(k['uzantoj'].toString())+' کاربر'
+    }
+    catch(e){
+      uzantoj = ''
+    }
+    prompti('<div id="statistiko">'+persa(k['argxentaj'].toString())+' خانهٔ معمولی'+'<br>'+persa(k['oraj'].toString())+' خانهٔ طلایی'+'<br>'+persa(k['muroj'].toString())+' دیوار'+'<br>'+uzantoj+'</div><div id="fermu" onclick="kasxi_prompton()">بستن</div>')
+  })
 }
 function montri_helpanton(){
   prompti('<iframe src="i.html"></iframe>'

@@ -443,3 +443,8 @@ iframe{
     border: none;
     height: 30vh;
 }
+#statistiko{
+    direction: rtl;
+    font-size: 6vw;
+    padding-right: 3vw;
+}
