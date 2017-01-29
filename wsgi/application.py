@@ -393,7 +393,6 @@ def ordo(seanco, ordoj):
         
     return json.dumps(True)
     
-#TTTU:
 @app.route("/konverti/<seanco>/<oro>")
 def konverti(seanco, oro):
     response.content_type = "application/json; charset=utf-8"
@@ -404,49 +403,55 @@ def konverti(seanco, oro):
     else:
         Uzanto.update(mono=Uzanto.mono+oro*40, oro=Uzanto.oro-oro).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
-
+    
+#TTTU:
 @app.route('/rekomenci/<seanco>')
 def rekomenci(seanco):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
     try:
-        #atenda uzanto:
+        #atenda aliulo:
         tttu = Tu.get(Tu.uzantoX == naturo, Tu.uzantoO != uzanto)
-        #rezignigi uzanton je aliaj ludoj:
-        #PORFARI premiu al oponanto
-        Tu.update(venkulo=Tu.uzantoO).where(Tu.uzantoX == uzanto)
-        Tu.update(venkulo=Tu.uzantoX).where(Tu.uzantoO == uzanto, Tu.uzantoX != naturo)
         #anstatauxigi naturon per uzanto:
         tttu.uzantoX = uzanto
         tttu.vico = tttu.uzantoO
         tttu.save()
     except Tu.DoesNotExist:
         try:
+            #atenda uzanto:
             tttu = Tu.get(Tu.uzantoX == naturo, Tu.uzantoO == uzanto)
         except Tu.DoesNotExist:
+            #krei ludon:
             tttu = Tu.create(uzantoO=uzanto, uzantoX=naturo, tabulo=81*'e', vico=naturo, venkulo=naturo)
-    return json.dumps(True)
+    return json.dumps({'stato':True, 'id':tttu.id})
 
-@app.route('/tabulo/<seanco>')
-def tabulo(seanco):
+@app.route('/tabuloj/<seanco>')
+def tabuloj(seanco):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
-    naturo = Uzanto.get(Uzanto.id == 1)
     try:
-        #kuranta ludo inter du uzantoj:
-        tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+        tttuj = Tu.select().where((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto))
+        if tttuj.count() == 0:
+            raise Tu.DoesNotExist
     except Tu.DoesNotExist:
-        try:
-            #finita ludo:
-            tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo != naturo))
-        except Tu.DoesNotExist:
-            try:
-                #atenda uzanto:
-                tttu = Tu.get(Tu.uzantoX == naturo, Tu.uzantoO == uzanto)
-            except Tu.DoesNotExist:
-                #preta por nova ludo:
-                return json.dumps(False)
+        #uzanto ne havas ludon:
+        return json.dumps(False)
+    tj = {}
+    for tttu in tttuj:
+        tj[str(tttu.id)] = {'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'venkulo':tttu.venkulo.nomo, 'vico':tttu.vico.nomo}
+    return json.dumps(tj)
+
+@app.route('/tabulo/<seanco>/<id>')
+def tabulo(seanco, id):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    #naturo = Uzanto.get(Uzanto.id == 1)
+    try:
+        tttu = Tu.get(((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.id == id))
+    except Tu.DoesNotExist:
+        #preta por nova ludo:
+        return json.dumps(False)
     tb = tttu.tabulo
     T = dict([(str(i//9), tb[i:i+9]) for i in range(0, len(tb), 9)])
     #nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
@@ -458,18 +463,7 @@ def tabulo(seanco):
         else:
             T[I] = {'t': T[I], 'S': 'E'}
     #nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
-    #kontroli se la ludo havas venkulo:
-    S = ''
-    for I in range(0,9):
-        S += T[str(I)]['S']
-    if tttu.venkulo != naturo:
-        venkulo = tttu.venkulo  
-    elif S[0:3] == 'XXX' or S[3:6] == 'XXX' or S[6:9] == 'XXX' or S[0::3] == 'XXX' or S[1::3] == 'XXX' or S[2::3] == 'XXX' or S[0]+S[4]+S[8] == 'XXX' or S[2]+S[4]+S[6] == 'XXX':
-        venkulo = tttu.uzantoX
-    elif S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO':
-        venkulo = tttu.uzantoO
-    else:
-        venkulo = naturo
+    #MENSNOTO ambaux uzantoj devas demandi tabulon lastafoje
     if tttu.venkulo == uzanto and not tttu.donita:
         tttu.update(donita=True).execute()
         partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == uzanto))
@@ -491,23 +485,25 @@ def tabulo(seanco):
     elif uzanto == tttu.uzantoX:
         xo = 'x'
         oponanto = tttu.uzantoO
-    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':venkulo.nomo})
+    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo})
 
-@app.route('/agi/<seanco>/<I>/<i>')
-def agi(seanco, I, i):
+@app.route('/agi/<seanco>/<id>/<I>/<i>')
+def agi(seanco, id, I, i):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
     I = int(I)
     i = int(i)
+    if I > 8 or i > 8 or I < 0 or i < 0:
+        return json.dumps('حرکت اشتباه!')
     try:
-        tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+        tttu = Tu.get((Tu.id == id) & (Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
     except Tu.DoesNotExist:
-        return json.dumps('لطفاً منتظر بمانید تا بازیکن دیگری به بازی بپیوندد.')
+        return json.dumps('بازی در حال جریان نیست!')
     if tttu.lastaIndekso != I and tttu.lastaIndekso != -1:
-        return json.dumps('senpermesa movo '+str(I)+':'+str(i))
+        return json.dumps('با توجه به حرکت قبلی حریف، تنها در خانه‌های طلایی مجاز به بازی هستید.')
     if tttu.vico != uzanto or tttu.vico == naturo:
-        return json.dumps('ne estas via vico')
+        return json.dumps('نوبت شما نیست!')
     tb = tttu.tabulo
     if tb[I*9+i] == 'e':
         if uzanto == tttu.uzantoO:
@@ -515,11 +511,11 @@ def agi(seanco, I, i):
         elif uzanto == tttu.uzantoX:
             tb = anstatauxigi(tb, I*9+i, 'x')
     else:
-        return json.dumps('ne estas malplena')
+        return json.dumps('خالی نیست!')
     tttu.tabulo = tb
     tttu.save()
     T = dict([(str(_//9), tb[_:_+9]) for _ in range(0, len(tb), 9)])
-    #nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
+    #:nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
     for I, t in T.items():
         if t[0:3] == 'xxx' or t[3:6] == 'xxx' or t[6:9] == 'xxx' or t[0::3] == 'xxx' or t[1::3] == 'xxx' or t[2::3] == 'xxx' or t[0]+t[4]+t[8] == 'xxx' or t[2]+t[4]+t[6] == 'xxx':
             T[I] = {'t': T[I], 'S': 'X'}
@@ -527,19 +523,19 @@ def agi(seanco, I, i):
             T[I] = {'t': T[I], 'S': 'O'}
         else:
             T[I] = {'t': T[I], 'S': 'E'}
-    #nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
-    #kontroli se la ludo havas venkulo:
+    #:nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
+    ##kontroli se la ludo havas venkulo:
     S = ''
     for I in range(0,9):
         S += T[str(I)]['S']
-        
-    if S[0:3] == 'XXX' or S[3:6] == 'XXX' or S[6:9] == 'XXX' or S[0::3] == 'XXX' or S[1::3] == 'XXX' or S[2::3] == 'XXX' or S[0]+S[4]+S[8] == 'XXX' or S[2]+S[4]+S[6] == 'XXX':
+    #kontrolado de uzanto kun uzantoX kaj uzantoO estas por antauxzorgi kontraux malnecesaj kalkuloj:
+    if uzanto == tttu.uzantoX and (S[0:3] == 'XXX' or S[3:6] == 'XXX' or S[6:9] == 'XXX' or S[0::3] == 'XXX' or S[1::3] == 'XXX' or S[2::3] == 'XXX' or S[0]+S[4]+S[8] == 'XXX' or S[2]+S[4]+S[6] == 'XXX'):
         tttu.venkulo = tttu.uzantoX
-    elif S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO':
+    elif uzanto == tttu.uzantoX and (S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO'):
         tttu.venkulo = tttu.uzantoO
     if T[str(i)]['S'] == 'E':
         tttu.lastaIndekso = i
-    else:
+    elif T[str(i)]['S'] == 'O' or T[str(i)]['S'] == 'X':
         tttu.lastaIndekso = -1
     if tttu.vico == tttu.uzantoO:
         tttu.vico = tttu.uzantoX
@@ -554,13 +550,13 @@ def agi(seanco, I, i):
         oponanto = tttu.uzantoO
     return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo})
 
-@app.route('/rezigni/<seanco>')
-def rezigni(seanco):
+@app.route('/rezigni/<seanco>/<id>')
+def rezigni(seanco, id):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
     try:
-        tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+        tttu = Tu.get((Tu.id == id) & (Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
     except Tu.DoesNotExist:
         return json.dumps(False)
     if tttu.uzantoO == uzanto:
@@ -581,16 +577,18 @@ def rezigni(seanco):
     if uzanto.oro > 40:
         uzanto.oro = 40
     uzanto.save()
-    tb = tttu.tabulo
-    T = dict([(str(_//9), tb[_:_+9]) for _ in range(0, len(tb), 9)])
-    if uzanto == tttu.uzantoO:
-        xo = 'o'
-        oponanto = tttu.uzantoX
-    elif uzanto == tttu.uzantoX:
-        xo = 'x'
-        oponanto = tttu.uzantoO
+    tttu.donita = True
     tttu.save()
-    print(tttu.venkulo.nomo)
-    tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo != naturo))
-    print(tttu.venkulo.nomo)
-    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo})
+    return json.dumps(True)
+
+@app.route('/nuligi/<seanco>/<id>')
+def nuligi(seanco, id):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    naturo = Uzanto.get(Uzanto.id == 1)
+    try:
+        tttu = Tu.get((Tu.id == id) & (Tu.uzantoX == naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+        tttu.delete_instance()
+        return json.dumps(True)
+    except Tu.DoesNotExist:
+        return json.dumps(False)

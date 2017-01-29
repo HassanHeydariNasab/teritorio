@@ -214,7 +214,6 @@ td{
     font-size: calc(3vh + 3vw);
     font-family: vzr;
     text-align: center;
-    margin-top: 3vh;
 }
 #rezignu{
     width: 100vw;
@@ -233,4 +232,15 @@ td{
     font-family: vzr;
     text-align: center;
     margin-top: 3vh;
+}
+#tu{
+    width: 100%;
+    height: 8vh;
+    font-size: 4vw;
+    text-align: right;
+    border: none;
+    font-family: vzr;
+    direction: rtl;
+    background-color: #fff;
+    color: #212121;
 }
