@@ -93,7 +93,15 @@ window.addEventListener('load', function(){
     else{
       finita = false
     }
-    window.localStorage.setItem('elektita', tu.value)
+    //trovi lasta ludo:
+    var oj = document.getElementsByTagName('option')
+    var maks = oj[0].value
+    for(o=0;o<oj.length;o++){
+      if(oj[o].value > maks){
+        maks = oj[o].value
+      }
+    }
+    window.localStorage.setItem('elektita', maks)
     if(!finita){
       r.tabulo(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
         if(!k){
