@@ -215,7 +215,7 @@ td{
     font-family: vzr;
     text-align: center;
 }
-#rezignu{
+#rezignu, #nuligu{
     width: 100vw;
     background-color: #E53935;
     color: #fff;

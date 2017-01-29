@@ -16,12 +16,14 @@ r.res('rekomenci')
 r.res('tabulo')
 r.res('agi')
 r.res('rezigni')
+r.res('nuligi')
 
 var T = document.getElementsByClassName('T')
 var informoj = document.getElementById('informoj')
 var tu = document.getElementById('tu')
 var rekomencu = document.getElementById('rekomencu')
 var rezignu = document.getElementById('rezignu')
+var nuligu = document.getElementById('nuligu')
 
 function persa(cifero){
   return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
@@ -53,6 +55,7 @@ function preni_tabulojn(){
       finita = true
       rezignu.style.display = 'none'
       rekomencu.style.display = ''
+      nuligu.style.display = 'none'
       informoj.innerHTML = 'یک بازی جدید شروع کنید.'
     }
     else{
@@ -84,6 +87,7 @@ window.addEventListener('load', function(){
       finita = true
       rezignu.style.display = 'none'
       rekomencu.style.display = ''
+      nuligu.style.display = 'none'
       informoj.innerHTML = 'یک بازی جدید شروع کنید.'
     }
     else{
@@ -95,10 +99,12 @@ window.addEventListener('load', function(){
         if(!k){
           rezignu.style.display = 'none'
           rekomencu.style.display = ''
+          nuligu.style.display = 'none'
         }
         else{
           rezignu.style.display = ''
           rekomencu.style.display = 'none'
+          nuligu.style.display = 'none'
           mapi(k)
         }
       })
@@ -109,10 +115,17 @@ window.addEventListener('load', function(){
           if(!k){
             rezignu.style.display = 'none'
             rekomencu.style.display = ''
+            nuligu.style.display = 'none'
           }
           else{
             rezignu.style.display = ''
             rekomencu.style.display = 'none'
+            if(k['oponanto'] == 'naturo'){
+              nuligu.style.display = ''
+            }
+            else{
+              nuligu.style.display = 'none'
+            }
             mapi(k)
           }
         })
@@ -156,21 +169,25 @@ function mapi(k){
     informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; پیروز: '+k['venkulo']
     rezignu.style.display = 'none'
     rekomencu.style.display = ''
+    nuligu.style.display = 'none'
   }
   else if(k['venkulo'] == 'naturo'){
     informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; نوبت: '+vico
     rezignu.style.display = ''
     rekomencu.style.display = 'none'
+    if(k['oponanto'] == 'naturo'){
+      nuligu.style.display = ''
+    }
+    else{
+      nuligu.style.display = 'none'
+    }
   }
   if(k['uzantoX'] == 'naturo'){
     informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
     rezignu.style.display = 'none'
     rekomencu.style.display = 'none'
+    nuligu.style.display = ''
   }
-  /*else if(k['uzantoX'] != 'naturo' && k['venkulo'] == 'naturo'){
-    rezignu.style.display = ''
-    rekomencu.style.display = ''
-  }*/
   var t = ''
   var koloro = 'e'
   for (I=0;I<=8;I++){
@@ -234,7 +251,17 @@ function rekomenci(){
       informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
       rezignu.style.display = 'none'
       rekomencu.style.display = 'none'
+      nuligu.style.display = ''
       window.localStorage.setItem('elektita', k['id'])
+    }
+  })
+}
+
+function nuligi(){
+  r.nuligi(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
+    window.localStorage.setItem('elektita', tu.value)
+    for(i=0;i<T.length;i++){
+      T[i.toString()].className = T[i.toString()].className.replace('aktiva','').replace('aktiva_por_aliulo','')
     }
   })
 }

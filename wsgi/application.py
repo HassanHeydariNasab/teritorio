@@ -587,7 +587,7 @@ def nuligi(seanco, id):
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
     try:
-        tttu = Tu.get((Tu.id == id) & (Tu.uzantoX == naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+        tttu = Tu.get((Tu.id == id) & (Tu.uzantoX == naturo) & (Tu.uzantoO == uzanto) & (Tu.venkulo == naturo))
         tttu.delete_instance()
         return json.dumps(True)
     except Tu.DoesNotExist:
