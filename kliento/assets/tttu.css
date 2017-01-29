@@ -1,0 +1,236 @@
+@font-face {
+    font-family: vzr;
+    src: url('Vazir.woff');
+}
+@font-face {
+    font-family: mvzr;
+    src: url('Vazir-Code.woff');
+}
+*{
+    padding: 0px;
+    margin: 0px;
+}
+html{
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+body{
+    font-family: vzr;
+    height: 100vh;
+    width: 100vw;
+    max-height: 100vh;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    background-color: #212121;
+}
+@keyframes montri_kasxi{
+    0%{
+	transform: none;
+	opacity: 0;
+    }
+    40%{
+	transform: translate(0px,-10vh);
+	opacity:1;
+    }
+    80%{
+	transform: translate(0px,-10vh);
+	opacity:1;
+    }
+    100%{
+	transform: none;
+	opacity: 0;
+    }
+}
+@keyframes montri{
+    0%{
+	transform: none;
+	opacity: 0;
+    }
+    100%{
+	transform: translate(0px,-10vh);
+	opacity:1;
+    }
+}
+@keyframes kasxi{
+    0%{
+	transform: translate(0px,-10vh);
+	opacity:1;
+    }
+    100%{
+	transform: none;
+	opacity: 0;
+    }
+}
+#informo{
+    display: none;
+    position: absolute;
+    top: 40vh;
+    right: 0px;
+    font-size: 5vh;
+    width: 100vw;
+    padding-right: 10vw;
+    direction: rtl;
+    text-align: right;
+    color: #43A047;
+    background-color: #212121;
+    text-align: right;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+    -webkit-animation-name: montri_kasxi;
+    animation-name: montri_kasxi;
+    
+    -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+    
+    -webkit-animation-delay: 0s;
+    -moz-animation-delay: 0s;
+    animation-delay: 0s;
+
+    transition: montri_kasxi 0s linear;
+}
+#prompto{
+    display: none;
+    position: absolute;
+    bottom: 25vh;
+    right: 0px;
+    font-size: 5vh;
+    width: 100vw;
+    color: #43A047;
+    background-color: #212121;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    text-align: right;
+    padding-top: 5vh;
+}
+.montri{
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+    -webkit-animation-name: montri;
+    animation-name: montri;
+    
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    
+    -webkit-animation-delay: 0s;
+    -moz-animation-delay: 0s;
+    animation-delay: 0s;
+
+    transition: montri 0s linear;
+}
+.kasxi{
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+    -webkit-animation-name: kasxi;
+    animation-name: kasxi;
+    
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    
+    -webkit-animation-delay: 0s;
+    -moz-animation-delay: 0s;
+    animation-delay: 0s;
+
+    transition: kasxi 0s linear;
+}
+#tabulo{
+    background-color: #fff;
+    height: 60vh;
+    max-height: 60vh;
+    width: 100%;
+    font-family: mvzr;
+    font-size: 2.41vh;
+    table-layout:fixed;
+}
+table{
+    border-spacing: 0px;
+}
+td{
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.T{
+    width: 100%;
+    height: 100%;
+    border: 2vw #212121 solid;
+}
+.aktiva{
+    background-color: #FDD835;
+}
+.aktiva_por_aliulo{
+    background-color: #9e9e9e;
+}
+.X{
+    background-image: url('X.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+.O{
+    background-image: url('O.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+.x{
+    background-image: url('x.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1vw #212121 solid;
+
+}
+.o{
+    background-image: url('o.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1vw #212121 solid;
+
+}
+.e{
+    border: 1vw #212121 solid;
+
+}
+#informoj{
+    background-color: #212121;
+    color: white;
+    *height: 12vh;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    direction: rtl;
+    padding: 1.4vh 0px;
+}
+#revenu{
+    width: 100vw;
+    background-color: #43A047;
+    color: #fff;
+    font-size: calc(3vh + 3vw);
+    font-family: vzr;
+    text-align: center;
+    margin-top: 3vh;
+}
+#rezignu{
+    width: 100vw;
+    background-color: #E53935;
+    color: #fff;
+    font-size: calc(3vh + 3vw);
+    font-family: vzr;
+    text-align: center;
+    margin-top: 3vh;
+}
+#rekomencu{
+    width: 100vw;
+    background-color: #43A047;
+    color: #fff;
+    font-size: calc(3vh + 3vw);
+    font-family: vzr;
+    text-align: center;
+    margin-top: 3vh;
+}

@@ -16,7 +16,7 @@ if 'OPENSHIFT_DATA_DIR' in os.environ:
     #db = PooledMySQLDatabase(os.environ['OPENSHIFT_APP_NAME'], host=url.hostname, port=url.port, user=url.username, passwd=url.password)
     db = PooledPostgresqlDatabase(os.environ['OPENSHIFT_APP_NAME'], host=url.hostname, port=url.port, user=url.username, password=url.password)
 else:
-    db = PooledSqliteDatabase('datumaro.db')
+    db = SqliteDatabase('datumaro.db')
 
 @hook('before_request')
 def _connect_db():
@@ -26,7 +26,6 @@ def _connect_db():
 def _close_db():
     if not db.is_closed():
         db.close()
-
 
 class Uzanto(Model):
     nomo = CharField()
@@ -62,9 +61,21 @@ class Ordo(Model):
     uzita = BooleanField(default=False)
     class Meta:
         database = db
-
+        
+#tttu:
+class Tu(Model):
+    uzantoO = ForeignKeyField(Uzanto, related_name='tu_o')
+    uzantoX = ForeignKeyField(Uzanto, related_name='tu_x')
+    tabulo = CharField()
+    vico = ForeignKeyField(Uzanto)
+    lastaIndekso = IntegerField(default=-1)
+    venkulo = ForeignKeyField(Uzanto, related_name='tu_venkajxo')
+    donita = BooleanField(default=False)
+    class Meta:
+        database = db
+    
 #db.connect()
-#db.create_tables([Ordo])
+#db.create_tables([Tu])
 
 def get_hashed_password(plain_text_password):
     # Hash a password for the first time
@@ -74,6 +85,11 @@ def get_hashed_password(plain_text_password):
 def check_password(plain_text_password, hashed_password):
     # Check hased password. Useing bcrypt, the salt is saved into the hash itself
     return bcrypt.checkpw(plain_text_password, hashed_password)
+
+def anstatauxigi(cxeno, indekso, signo):
+    listo = list(cxeno)
+    listo[indekso] = signo
+    return ''.join(listo)
 
 def krei_mondon(x, y):
     for i in range(0, x):
@@ -112,7 +128,7 @@ def testo():
     response.content_type = "application/json; charset=utf-8"
     return json.dumps("test!")
 
-@app.get("/subskribi/<nomo>/<pasvorto>")
+@app.route("/subskribi/<nomo>/<pasvorto>")
 def subskribi(nomo, pasvorto):
     #PORFARI cxu retposxto/telefono devas konfirmigxi?
     response.content_type = "application/json; charset=utf-8"
@@ -125,7 +141,7 @@ def subskribi(nomo, pasvorto):
         UzantoVidPunkto.create(uzanto=uzanto, parto=1275)
         return json.dumps(True)
 
-@app.get("/ensaluti/<nomo>/<pasvorto>")
+@app.route("/ensaluti/<nomo>/<pasvorto>")
 def ensaluti(nomo, pasvorto):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.nomo == nomo)
@@ -377,6 +393,7 @@ def ordo(seanco, ordoj):
         
     return json.dumps(True)
     
+#TTTU:
 @app.route("/konverti/<seanco>/<oro>")
 def konverti(seanco, oro):
     response.content_type = "application/json; charset=utf-8"
@@ -387,3 +404,193 @@ def konverti(seanco, oro):
     else:
         Uzanto.update(mono=Uzanto.mono+oro*40, oro=Uzanto.oro-oro).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
+
+@app.route('/rekomenci/<seanco>')
+def rekomenci(seanco):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    naturo = Uzanto.get(Uzanto.id == 1)
+    try:
+        #atenda uzanto:
+        tttu = Tu.get(Tu.uzantoX == naturo, Tu.uzantoO != uzanto)
+        #rezignigi uzanton je aliaj ludoj:
+        #PORFARI premiu al oponanto
+        Tu.update(venkulo=Tu.uzantoO).where(Tu.uzantoX == uzanto)
+        Tu.update(venkulo=Tu.uzantoX).where(Tu.uzantoO == uzanto, Tu.uzantoX != naturo)
+        #anstatauxigi naturon per uzanto:
+        tttu.uzantoX = uzanto
+        tttu.vico = tttu.uzantoO
+        tttu.save()
+    except Tu.DoesNotExist:
+        try:
+            tttu = Tu.get(Tu.uzantoX == naturo, Tu.uzantoO == uzanto)
+        except Tu.DoesNotExist:
+            tttu = Tu.create(uzantoO=uzanto, uzantoX=naturo, tabulo=81*'e', vico=naturo, venkulo=naturo)
+    return json.dumps(True)
+
+@app.route('/tabulo/<seanco>')
+def tabulo(seanco):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    naturo = Uzanto.get(Uzanto.id == 1)
+    try:
+        #kuranta ludo inter du uzantoj:
+        tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+    except Tu.DoesNotExist:
+        try:
+            #finita ludo:
+            tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo != naturo))
+        except Tu.DoesNotExist:
+            try:
+                #atenda uzanto:
+                tttu = Tu.get(Tu.uzantoX == naturo, Tu.uzantoO == uzanto)
+            except Tu.DoesNotExist:
+                #preta por nova ludo:
+                return json.dumps(False)
+    tb = tttu.tabulo
+    T = dict([(str(i//9), tb[i:i+9]) for i in range(0, len(tb), 9)])
+    #nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
+    for I, t in T.items():
+        if t[0:3] == 'xxx' or t[3:6] == 'xxx' or t[6:9] == 'xxx' or t[0::3] == 'xxx' or t[1::3] == 'xxx' or t[2::3] == 'xxx' or t[0]+t[4]+t[8] == 'xxx' or t[2]+t[4]+t[6] == 'xxx':
+            T[I] = {'t': T[I], 'S': 'X'}
+        elif t[0:3] == 'ooo' or t[3:6] == 'ooo' or t[6:9] == 'ooo' or t[0::3] == 'ooo' or t[1::3] == 'ooo' or t[2::3] == 'ooo' or t[0]+t[4]+t[8] == 'ooo' or t[2]+t[4]+t[6] == 'ooo':
+            T[I] = {'t': T[I], 'S': 'O'}
+        else:
+            T[I] = {'t': T[I], 'S': 'E'}
+    #nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
+    #kontroli se la ludo havas venkulo:
+    S = ''
+    for I in range(0,9):
+        S += T[str(I)]['S']
+    if tttu.venkulo != naturo:
+        venkulo = tttu.venkulo  
+    elif S[0:3] == 'XXX' or S[3:6] == 'XXX' or S[6:9] == 'XXX' or S[0::3] == 'XXX' or S[1::3] == 'XXX' or S[2::3] == 'XXX' or S[0]+S[4]+S[8] == 'XXX' or S[2]+S[4]+S[6] == 'XXX':
+        venkulo = tttu.uzantoX
+    elif S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO':
+        venkulo = tttu.uzantoO
+    else:
+        venkulo = naturo
+    if tttu.venkulo == uzanto and not tttu.donita:
+        tttu.update(donita=True).execute()
+        partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == uzanto))
+        for parto in partoj:
+            if parto.materialo == 'argxento':
+                uzanto.mono += parto.nivelo
+            elif parto.materialo == 'oro':
+                uzanto.oro += parto.nivelo
+            parto.minajxo -= parto.nivelo
+            if parto.minajxo < 0:
+                parto.minajxo = 0
+            parto.save()
+            if uzanto.oro > 40:
+                uzanto.oro = 40
+            uzanto.save()
+    if uzanto == tttu.uzantoO:
+        xo = 'o'
+        oponanto = tttu.uzantoX
+    elif uzanto == tttu.uzantoX:
+        xo = 'x'
+        oponanto = tttu.uzantoO
+    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':venkulo.nomo})
+
+@app.route('/agi/<seanco>/<I>/<i>')
+def agi(seanco, I, i):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    naturo = Uzanto.get(Uzanto.id == 1)
+    I = int(I)
+    i = int(i)
+    try:
+        tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+    except Tu.DoesNotExist:
+        return json.dumps('لطفاً منتظر بمانید تا بازیکن دیگری به بازی بپیوندد.')
+    if tttu.lastaIndekso != I and tttu.lastaIndekso != -1:
+        return json.dumps('senpermesa movo '+str(I)+':'+str(i))
+    if tttu.vico != uzanto or tttu.vico == naturo:
+        return json.dumps('ne estas via vico')
+    tb = tttu.tabulo
+    if tb[I*9+i] == 'e':
+        if uzanto == tttu.uzantoO:
+            tb = anstatauxigi(tb, I*9+i, 'o')
+        elif uzanto == tttu.uzantoX:
+            tb = anstatauxigi(tb, I*9+i, 'x')
+    else:
+        return json.dumps('ne estas malplena')
+    tttu.tabulo = tb
+    tttu.save()
+    T = dict([(str(_//9), tb[_:_+9]) for _ in range(0, len(tb), 9)])
+    #nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
+    for I, t in T.items():
+        if t[0:3] == 'xxx' or t[3:6] == 'xxx' or t[6:9] == 'xxx' or t[0::3] == 'xxx' or t[1::3] == 'xxx' or t[2::3] == 'xxx' or t[0]+t[4]+t[8] == 'xxx' or t[2]+t[4]+t[6] == 'xxx':
+            T[I] = {'t': T[I], 'S': 'X'}
+        elif t[0:3] == 'ooo' or t[3:6] == 'ooo' or t[6:9] == 'ooo' or t[0::3] == 'ooo' or t[1::3] == 'ooo' or t[2::3] == 'ooo' or t[0]+t[4]+t[8] == 'ooo' or t[2]+t[4]+t[6] == 'ooo':
+            T[I] = {'t': T[I], 'S': 'O'}
+        else:
+            T[I] = {'t': T[I], 'S': 'E'}
+    #nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
+    #kontroli se la ludo havas venkulo:
+    S = ''
+    for I in range(0,9):
+        S += T[str(I)]['S']
+        
+    if S[0:3] == 'XXX' or S[3:6] == 'XXX' or S[6:9] == 'XXX' or S[0::3] == 'XXX' or S[1::3] == 'XXX' or S[2::3] == 'XXX' or S[0]+S[4]+S[8] == 'XXX' or S[2]+S[4]+S[6] == 'XXX':
+        tttu.venkulo = tttu.uzantoX
+    elif S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO':
+        tttu.venkulo = tttu.uzantoO
+    if T[str(i)]['S'] == 'E':
+        tttu.lastaIndekso = i
+    else:
+        tttu.lastaIndekso = -1
+    if tttu.vico == tttu.uzantoO:
+        tttu.vico = tttu.uzantoX
+    elif tttu.vico == tttu.uzantoX:
+        tttu.vico = tttu.uzantoO
+    tttu.save()
+    if uzanto == tttu.uzantoO:
+        xo = 'o'
+        oponanto = tttu.uzantoX
+    elif uzanto == tttu.uzantoX:
+        xo = 'x'
+        oponanto = tttu.uzantoO
+    return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo})
+
+@app.route('/rezigni/<seanco>')
+def rezigni(seanco):
+    response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    naturo = Uzanto.get(Uzanto.id == 1)
+    try:
+        tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+    except Tu.DoesNotExist:
+        return json.dumps(False)
+    if tttu.uzantoO == uzanto:
+        tttu.venkulo = tttu.uzantoX
+        partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == tttu.uzantoX))
+    elif tttu.uzantoX == uzanto:
+        tttu.venkulo = tttu.uzantoO
+        partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == tttu.uzantoO))
+    for parto in partoj:
+        if parto.materialo == 'argxento':
+            uzanto.mono += parto.nivelo
+        elif parto.materialo == 'oro':
+            uzanto.oro += parto.nivelo
+        parto.minajxo -= parto.nivelo
+        if parto.minajxo < 0:
+            parto.minajxo = 0
+        parto.save()
+    if uzanto.oro > 40:
+        uzanto.oro = 40
+    uzanto.save()
+    tb = tttu.tabulo
+    T = dict([(str(_//9), tb[_:_+9]) for _ in range(0, len(tb), 9)])
+    if uzanto == tttu.uzantoO:
+        xo = 'o'
+        oponanto = tttu.uzantoX
+    elif uzanto == tttu.uzantoX:
+        xo = 'x'
+        oponanto = tttu.uzantoO
+    tttu.save()
+    print(tttu.venkulo.nomo)
+    tttu = Tu.get((Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo != naturo))
+    print(tttu.venkulo.nomo)
+    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo})

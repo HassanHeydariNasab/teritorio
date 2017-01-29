@@ -29,6 +29,15 @@ def run_simple_httpd_server(app, ip, port=8080):
 #
 #  main():
 #
+'''
+from threading import Timer
+from wsgi.application import Tu
+def retronombri():
+  Timer(1.0, retronombri).start()
+  Tu.update(tempoO=Tu.tempoO-1).where(Tu.vico==Tu.uzantoO).execute()
+  Tu.update(tempoX=Tu.tempoX-1).where(Tu.vico==Tu.uzantoX).execute()
+retronombri()
+'''
 if __name__ == '__main__' and 'OPENSHIFT_REPO_DIR' in os.environ:
    ip   = os.environ['OPENSHIFT_PYTHON_IP']
    port = 8080

@@ -55,10 +55,11 @@ function iri(){
 }
 function montri_menuon(){
   prompti('<div class="menuano" onclick="javascript:iri()">پرش</div>'
-          + '<div class="menuano" onclick="javascript:montri_statistikon()">آمار</div>'
-          + '<div class="menuano" onclick="javascript:montri_rangon()">بهترین‌ها</div>'
-          + '<div class="menuano" onclick="javascript:montri_helpanton()">راهنما</div>'
-          + '<div id="fermu" onclick="kasxi_prompton()">بستن</div>')
+         + '<div class="menuano" onclick="javascript:tttu()">تیک‌تاک</div>'
+         + '<div class="menuano" onclick="javascript:montri_statistikon()">آمار</div>'
+         + '<div class="menuano" onclick="javascript:montri_rangon()">بهترین‌ها</div>'
+         + '<div class="menuano" onclick="javascript:montri_helpanton()">راهنما</div>'
+         + '<div id="fermu" onclick="kasxi_prompton()">بستن</div>')
 }
 function montri_konverton(){
   prompti('<div class="rtl">'
@@ -95,6 +96,9 @@ function montri_rangon(){
 function montri_helpanton(){
   prompti('<iframe src="i.html"></iframe>'
           + '<div id="fermu" onclick="kasxi_prompton()">بستن</div>')
+}
+function tttu(){
+  window.location = 'tttu.html'
 }
 function konvertu(){
   r.konverti(window.localStorage.getItem('seanco')+'/'+document.getElementById('oro').value).get().then(function(k){

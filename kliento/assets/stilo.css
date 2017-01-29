@@ -306,7 +306,7 @@ a{
 #prompto{
     display: none;
     position: absolute;
-    bottom: 25vh;
+    bottom: 15vh;
     right: 0px;
     font-size: 5vh;
     width: 100vw;
@@ -352,11 +352,11 @@ a{
 }
 .argxenta_minajxo{
     background-color: #e0e0e0;
-    color: #212121
+    color: #212121;
 }
 .ora_minajxo{
     background-color: #FDD835;
-    color: #212121
+    color: #212121;
 }
 .acxetebla{
     background-color: #e0e0e0;
