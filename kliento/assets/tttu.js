@@ -1,7 +1,7 @@
 var r
 if(window.location.toString().match(/android/)){
-  //var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
-  r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
+  //r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 else{
   r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
@@ -25,6 +25,10 @@ var rekomencu = document.getElementById('rekomencu')
 var rezignu = document.getElementById('rezignu')
 var nuligu = document.getElementById('nuligu')
 
+rezignu.style.display = 'none'
+rekomencu.style.display = 'none'
+nuligu.style.display = 'none'
+
 function persa(cifero){
   return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
 }
@@ -33,6 +37,7 @@ function reveni(){
   window.location = 'ludo.html'
 }
 function preni_tabulojn(){
+  var prenita = false
   r.tabuloj(window.localStorage.getItem('seanco')).get().then(function(k){
     var tuo = ''
     for(var t in k){
@@ -63,45 +68,25 @@ function preni_tabulojn(){
     }
     tu.value = window.localStorage.getItem('elektita')
   })
+  prenita = true
+  return prenita
 }
-window.addEventListener('load', function(){
-  r.tabuloj(window.localStorage.getItem('seanco')).get().then(function(k){
-    var tuo = ''
-    for(var t in k){
-      if(k[t]['venkulo'] == 'naturo'){
-        k[t]['venkulo'] = 'هیچ‌کس!'
+r.tabuloj(window.localStorage.getItem('seanco')).get().then(function(k){
+  if(preni_tabulojn()){
+    //trovi lastan ludon:
+    var oj = document.getElementsByTagName('option')
+    if(oj.length > 0){
+      var maks = oj[0].value
+      for(o=0;o<oj.length;o++){
+        if(oj[o].value > maks){
+          maks = oj[o].value
+        }
       }
-      if(k[t]['uzantoO'] == 'naturo'){
-        k[t]['uzantoO'] = 'هیچ‌کس!'
-      }
-      if(k[t]['uzantoX'] == 'naturo'){
-        k[t]['uzantoX'] = 'هیچ‌کس!'
-      }
-      if(k[t]['vico'] == 'naturo'){
-        k[t]['vico'] = 'هیچ‌کس!'
-      }
-      tuo += '<option value="'+t+'" >'+persa(t)+' > '+k[t]['uzantoO'] + ' علیه ' + k[t]['uzantoX']+' | نوبت: '+k[t]['vico']+' | پیروز: '+k[t]['venkulo']+'</option>'
-    }
-    tu.innerHTML = tuo
-    if(tuo == ''){
-      finita = true
-      rezignu.style.display = 'none'
-      rekomencu.style.display = ''
-      nuligu.style.display = 'none'
-      informoj.innerHTML = 'یک بازی جدید شروع کنید.'
+      window.localStorage.setItem('elektita', maks)
     }
     else{
-      finita = false
+      finita = true
     }
-    //trovi lasta ludo:
-    var oj = document.getElementsByTagName('option')
-    var maks = oj[0].value
-    for(o=0;o<oj.length;o++){
-      if(oj[o].value > maks){
-        maks = oj[o].value
-      }
-    }
-    window.localStorage.setItem('elektita', maks)
     if(!finita){
       r.tabulo(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
         if(!k){
@@ -139,8 +124,9 @@ window.addEventListener('load', function(){
         })
       }
     },3000)
+    }
   })
-})
+
 tu.addEventListener('change', function(){
   window.localStorage.setItem('elektita', tu.value)
 })
@@ -161,7 +147,6 @@ function ijIndekso(i, j){
 }
 function mapi(k){
   preni_tabulojn()
-  //tu.value = window.localStorage.getItem('elektita')
   var mapo = k['Tabulo']
   var uzanto = k['uzanto']
   var vico = k['vico']
@@ -256,11 +241,13 @@ function rekomenci(){
   r.rekomenci(window.localStorage.getItem('seanco')).get().then(function(k){
     if(k['stato']){
       finita = false
-      informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
-      rezignu.style.display = 'none'
-      rekomencu.style.display = 'none'
-      nuligu.style.display = ''
-      window.localStorage.setItem('elektita', k['id'])
+      if (preni_tabulojn()){
+        informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
+        rezignu.style.display = 'none'
+        rekomencu.style.display = 'none'
+        nuligu.style.display = ''
+        window.localStorage.setItem('elektita', k['id'])
+      }
     }
   })
 }
@@ -268,8 +255,10 @@ function rekomenci(){
 function nuligi(){
   r.nuligi(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
     window.localStorage.setItem('elektita', tu.value)
-    for(i=0;i<T.length;i++){
-      T[i.toString()].className = T[i.toString()].className.replace('aktiva','').replace('aktiva_por_aliulo','')
+    if (preni_tabulojn()){
+      for(i=0;i<T.length;i++){
+        T[i.toString()].className = T[i.toString()].className.replace('aktiva','').replace('aktiva_por_aliulo','')
+      }
     }
   })
 }

@@ -166,13 +166,13 @@ td{
     background-color: #9e9e9e;
 }
 .X{
-    background-image: url('X.svg');
+    background-image: url('xx.svg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
 }
 .O{
-    background-image: url('O.svg');
+    background-image: url('oo.svg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
