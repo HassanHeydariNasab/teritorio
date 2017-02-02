@@ -1,11 +1,11 @@
 var r
 if(window.location.toString().match(/android/)){
-  var r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
-  //r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  //r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
+  r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 else{
-  r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-  //var r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  //r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+  r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 
 var cl = console.log
@@ -164,7 +164,7 @@ function mapi(k){
     rezignu.style.display = 'none'
     rekomencu.style.display = ''
     nuligu.style.display = 'none'
-    tempiloj.innerHTML = 'O: '+k['tempilo_uzantoO'].toString()+' | X: '+k['tempilo_uzantoX'].toString()
+    tempiloj.innerHTML = 'O: '+(300-k['tempilo_uzantoO']).toString()+' ثانیه '+' | X: '+(300-k['tempilo_uzantoX']).toString()+' ثانیه'
   }
   else if(k['venkulo'] == 'naturo'){
     informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; نوبت: '+vico

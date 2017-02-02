@@ -1,11 +1,11 @@
 var r
 if(window.location.toString().match(/android/)){
-  r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
-  //r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  //r = new RestClient('http://10.0.2.2:8080', {contentType: 'json'});
+  r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 else{
-  r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-  //r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  //r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+  r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 r.res('mapo')
 r.res('vidpunkto')

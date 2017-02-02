@@ -409,12 +409,16 @@ def konverti(seanco, oro):
 
 #TTTU:
 tempiloj = {}
+finitaj = []
 def kontroli_tempon(tttu):
     global tempiloj
+    global finitaj
     while True:
         #gxisdatigi tempilo_{id}_uzanto{O|X} je tempiloj:
         exec('tempiloj["tempilo_{id}_uzantoO"] = tempilo_{id}.elapsed_time("uzantoO")'.format(id=tttu.id), globals())
         exec('tempiloj["tempilo_{id}_uzantoX"] = tempilo_{id}.elapsed_time("uzantoX")'.format(id=tttu.id), globals())
+        if tttu.id in finitaj:
+            break
         #kontroli se tempo finis por uzanto:
         if int(tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]) >= 300:
             rezigni(tttu.uzantoO.seanco, tttu.id, mana=True)
@@ -455,6 +459,7 @@ def rekomenci(seanco):
         
 @app.route('/rezigni/<seanco>/<id>')
 def rezigni(seanco, id, mana=False):
+    global finitaj
     if not mana:
         response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
@@ -483,6 +488,7 @@ def rezigni(seanco, id, mana=False):
     uzanto.save()
     tttu.donita = True
     tttu.save()
+    finitaj.append(tttu.id)
     if not mana:
         return json.dumps(True)
 
@@ -508,6 +514,7 @@ def tabulo(seanco, id):
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
     global tempiloj
+    global finitaj
     try:
         tttu = Tu.get(((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.id == id))
     except Tu.DoesNotExist:
@@ -526,6 +533,7 @@ def tabulo(seanco, id):
     #nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
     #MENSNOTO ambaux uzantoj devas demandi tabulon lastafoje
     if tttu.venkulo == uzanto and not tttu.donita:
+        finitaj.append(tttu.id)
         tttu.update(donita=True).execute()
         partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == uzanto))
         for parto in partoj:
@@ -558,6 +566,7 @@ def agi(seanco, id, I, i):
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
     global tempiloj
+    global finitaj
     I = int(I)
     i = int(i)
     if I > 8 or i > 8 or I < 0 or i < 0:
@@ -596,8 +605,10 @@ def agi(seanco, id, I, i):
         S += T[str(I)]['S']
     #kontrolado de uzanto kun uzantoX kaj uzantoO estas por antauxzorgi kontraux malnecesaj kalkuloj:
     if uzanto == tttu.uzantoX and (S[0:3] == 'XXX' or S[3:6] == 'XXX' or S[6:9] == 'XXX' or S[0::3] == 'XXX' or S[1::3] == 'XXX' or S[2::3] == 'XXX' or S[0]+S[4]+S[8] == 'XXX' or S[2]+S[4]+S[6] == 'XXX'):
+        finitaj.append(tttu.id)
         tttu.venkulo = tttu.uzantoX
     elif uzanto == tttu.uzantoX and (S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO'):
+        finitaj.append(tttu.id)
         tttu.venkulo = tttu.uzantoO
     if T[str(i)]['S'] == 'E':
         tttu.lastaIndekso = i
