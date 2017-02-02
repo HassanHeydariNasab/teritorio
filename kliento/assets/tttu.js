@@ -20,6 +20,7 @@ r.res('nuligi')
 
 var T = document.getElementsByClassName('T')
 var informoj = document.getElementById('informoj')
+var tempiloj = document.getElementById('tempiloj')
 var tu = document.getElementById('tu')
 var rekomencu = document.getElementById('rekomencu')
 var rezignu = document.getElementById('rezignu')
@@ -163,6 +164,7 @@ function mapi(k){
     rezignu.style.display = 'none'
     rekomencu.style.display = ''
     nuligu.style.display = 'none'
+    tempiloj.innerHTML = 'O: '+k['tempilo_uzantoO'].toString()+' | X: '+k['tempilo_uzantoX'].toString()
   }
   else if(k['venkulo'] == 'naturo'){
     informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; نوبت: '+vico
@@ -174,6 +176,7 @@ function mapi(k){
     else{
       nuligu.style.display = 'none'
     }
+    tempiloj.innerHTML = 'O: '+k['tempilo_uzantoO'].toString()+' | X: '+k['tempilo_uzantoX'].toString()
   }
   if(k['uzantoX'] == 'naturo'){
     informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'

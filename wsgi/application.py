@@ -8,6 +8,9 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 from random import sample, randrange, randint, choice
 from collections import Counter
+from wsgi.ChessTimer import ChessTimer
+from time import sleep
+import threading
 
 if 'OPENSHIFT_DATA_DIR' in os.environ:
     #db = SqliteDatabase(os.environ['OPENSHIFT_DATA_DIR']+'datumaro.db')
@@ -403,13 +406,30 @@ def konverti(seanco, oro):
     else:
         Uzanto.update(mono=Uzanto.mono+oro*40, oro=Uzanto.oro-oro).where(Uzanto.seanco == seanco).execute()
         return json.dumps(True)
-    
+
 #TTTU:
+tempiloj = {}
+def kontroli_tempon(tttu):
+    global tempiloj
+    while True:
+        #gxisdatigi tempilo_{id}_uzanto{O|X} je tempiloj:
+        exec('tempiloj["tempilo_{id}_uzantoO"] = tempilo_{id}.elapsed_time("uzantoO")'.format(id=tttu.id), globals())
+        exec('tempiloj["tempilo_{id}_uzantoX"] = tempilo_{id}.elapsed_time("uzantoX")'.format(id=tttu.id), globals())
+        #kontroli se tempo finis por uzanto:
+        if int(tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]) >= 300:
+            rezigni(tttu.uzantoO.seanco, tttu.id, mana=True)
+            break
+        if int(tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]) >= 300:
+            rezigni(tttu.uzantoX.seanco, tttu.id, mana=True)
+            break
+        sleep(1)
+
 @app.route('/rekomenci/<seanco>')
 def rekomenci(seanco):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
+    global tempiloj
     try:
         #atenda aliulo:
         tttu = Tu.get(Tu.uzantoX == naturo, Tu.uzantoO != uzanto)
@@ -417,6 +437,10 @@ def rekomenci(seanco):
         tttu.uzantoX = uzanto
         tttu.vico = tttu.uzantoO
         tttu.save()
+        #agordi tempilojn kaj komenci tempilon:
+        exec("tempilo_{id}.switch_to('uzantoX')".format(id=str(tttu.id)), globals())
+        exec("tempilo_{id}.switch_to('uzantoO')".format(id=str(tttu.id)), globals())
+        threading.Thread(target=kontroli_tempon, args=(tttu,)).start()
     except Tu.DoesNotExist:
         try:
             #atenda uzanto:
@@ -424,7 +448,43 @@ def rekomenci(seanco):
         except Tu.DoesNotExist:
             #krei ludon:
             tttu = Tu.create(uzantoO=uzanto, uzantoX=naturo, tabulo=81*'e', vico=naturo, venkulo=naturo)
+            #krei tempilon:
+            exec("tempilo_{id} = ChessTimer()".format(id=str(tttu.id)), globals())
+            exec("tempiloj['tempilo_{id}_uzantoO'] = 0;tempiloj['tempilo_{id}_uzantoX'] = 0".format(id=str(tttu.id)), globals())
     return json.dumps({'stato':True, 'id':tttu.id})
+        
+@app.route('/rezigni/<seanco>/<id>')
+def rezigni(seanco, id, mana=False):
+    if not mana:
+        response.content_type = "application/json; charset=utf-8"
+    uzanto = Uzanto.get(Uzanto.seanco == seanco)
+    naturo = Uzanto.get(Uzanto.id == 1)
+    try:
+        tttu = Tu.get((Tu.id == id) & (Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
+    except Tu.DoesNotExist:
+        return json.dumps(False)
+    if tttu.uzantoO == uzanto:
+        tttu.venkulo = tttu.uzantoX
+        partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == tttu.uzantoX))
+    elif tttu.uzantoX == uzanto:
+        tttu.venkulo = tttu.uzantoO
+        partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == tttu.uzantoO))
+    for parto in partoj:
+        if parto.materialo == 'argxento':
+            uzanto.mono += parto.nivelo
+        elif parto.materialo == 'oro':
+            uzanto.oro += parto.nivelo
+        parto.minajxo -= parto.nivelo
+        if parto.minajxo < 0:
+            parto.minajxo = 0
+        parto.save()
+    if uzanto.oro > 40:
+        uzanto.oro = 40
+    uzanto.save()
+    tttu.donita = True
+    tttu.save()
+    if not mana:
+        return json.dumps(True)
 
 @app.route('/tabuloj/<seanco>')
 def tabuloj(seanco):
@@ -446,7 +506,8 @@ def tabuloj(seanco):
 def tabulo(seanco, id):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
-    #naturo = Uzanto.get(Uzanto.id == 1)
+    naturo = Uzanto.get(Uzanto.id == 1)
+    global tempiloj
     try:
         tttu = Tu.get(((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.id == id))
     except Tu.DoesNotExist:
@@ -485,13 +546,18 @@ def tabulo(seanco, id):
     elif uzanto == tttu.uzantoX:
         xo = 'x'
         oponanto = tttu.uzantoO
-    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo})
+    tempilo_uzantoO = 0
+    tempilo_uzantoX = 0
+    tempilo_uzantoO = tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]
+    tempilo_uzantoX = tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]
+    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX)})
 
 @app.route('/agi/<seanco>/<id>/<I>/<i>')
 def agi(seanco, id, I, i):
     response.content_type = "application/json; charset=utf-8"
     uzanto = Uzanto.get(Uzanto.seanco == seanco)
     naturo = Uzanto.get(Uzanto.id == 1)
+    global tempiloj
     I = int(I)
     i = int(i)
     if I > 8 or i > 8 or I < 0 or i < 0:
@@ -539,8 +605,10 @@ def agi(seanco, id, I, i):
         tttu.lastaIndekso = -1
     if tttu.vico == tttu.uzantoO:
         tttu.vico = tttu.uzantoX
+        exec('tempilo_{id}.switch_to("uzantoX")'.format(id=str(tttu.id)), globals())
     elif tttu.vico == tttu.uzantoX:
         tttu.vico = tttu.uzantoO
+        exec('tempilo_{id}.switch_to("uzantoO")'.format(id=str(tttu.id)), globals())
     tttu.save()
     if uzanto == tttu.uzantoO:
         xo = 'o'
@@ -548,38 +616,11 @@ def agi(seanco, id, I, i):
     elif uzanto == tttu.uzantoX:
         xo = 'x'
         oponanto = tttu.uzantoO
-    return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo})
-
-@app.route('/rezigni/<seanco>/<id>')
-def rezigni(seanco, id):
-    response.content_type = "application/json; charset=utf-8"
-    uzanto = Uzanto.get(Uzanto.seanco == seanco)
-    naturo = Uzanto.get(Uzanto.id == 1)
-    try:
-        tttu = Tu.get((Tu.id == id) & (Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
-    except Tu.DoesNotExist:
-        return json.dumps(False)
-    if tttu.uzantoO == uzanto:
-        tttu.venkulo = tttu.uzantoX
-        partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == tttu.uzantoX))
-    elif tttu.uzantoX == uzanto:
-        tttu.venkulo = tttu.uzantoO
-        partoj = Parto.select().where((Parto.minajxo > 0) & (Parto.uzanto == tttu.uzantoO))
-    for parto in partoj:
-        if parto.materialo == 'argxento':
-            uzanto.mono += parto.nivelo
-        elif parto.materialo == 'oro':
-            uzanto.oro += parto.nivelo
-        parto.minajxo -= parto.nivelo
-        if parto.minajxo < 0:
-            parto.minajxo = 0
-        parto.save()
-    if uzanto.oro > 40:
-        uzanto.oro = 40
-    uzanto.save()
-    tttu.donita = True
-    tttu.save()
-    return json.dumps(True)
+    tempilo_uzantoO = 0
+    tempilo_uzantoX = 0
+    tempilo_uzantoO = tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]
+    tempilo_uzantoX = tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]
+    return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX)})
 
 @app.route('/nuligi/<seanco>/<id>')
 def nuligi(seanco, id):

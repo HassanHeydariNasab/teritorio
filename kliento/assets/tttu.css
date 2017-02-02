@@ -207,6 +207,15 @@ td{
     direction: rtl;
     padding: 1.4vh 0px;
 }
+#tempiloj{
+    background-color: #212121;
+    color: white;
+    *height: 12vh;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    direction: rtl;
+}
 #revenu{
     width: 100vw;
     background-color: #43A047;
@@ -222,7 +231,7 @@ td{
     font-size: calc(3vh + 3vw);
     font-family: vzr;
     text-align: center;
-    margin-top: 3vh;
+    margin-top: 1vh;
 }
 #rekomencu{
     width: 100vw;
@@ -231,7 +240,7 @@ td{
     font-size: calc(3vh + 3vw);
     font-family: vzr;
     text-align: center;
-    margin-top: 3vh;
+    margin-top: 1vh;
 }
 #tu{
     width: 100%;
