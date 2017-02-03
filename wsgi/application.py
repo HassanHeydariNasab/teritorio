@@ -74,6 +74,7 @@ class Tu(Model):
     lastaIndekso = IntegerField(default=-1)
     venkulo = ForeignKeyField(Uzanto, related_name='tu_venkajxo')
     donita = BooleanField(default=False)
+    egalita = BooleanField(default=False)
     class Meta:
         database = db
     
@@ -428,6 +429,21 @@ def kontroli_tempon(tttu):
             break
         sleep(1)
 
+def Tabuloj(tabulo):
+    T = dict([(str(_//9), tabulo[_:_+9]) for _ in range(0, len(tabulo), 9)])
+    ##:nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
+    for I, t in T.items():
+        if t[0:3] == 'xxx' or t[3:6] == 'xxx' or t[6:9] == 'xxx' or t[0::3] == 'xxx' or t[1::3] == 'xxx' or t[2::3] == 'xxx' or t[0]+t[4]+t[8] == 'xxx' or t[2]+t[4]+t[6] == 'xxx':
+            T[I] = {'t': T[I], 'S': 'X'}
+        elif t[0:3] == 'ooo' or t[3:6] == 'ooo' or t[6:9] == 'ooo' or t[0::3] == 'ooo' or t[1::3] == 'ooo' or t[2::3] == 'ooo' or t[0]+t[4]+t[8] == 'ooo' or t[2]+t[4]+t[6] == 'ooo':
+            T[I] = {'t': T[I], 'S': 'O'}
+        elif not 'e' in t:
+            T[I] = {'t': T[I], 'S': 'P'}
+        else:
+            T[I] = {'t': T[I], 'S': 'E'}
+    ##:nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
+    return T
+    
 @app.route('/rekomenci/<seanco>')
 def rekomenci(seanco):
     response.content_type = "application/json; charset=utf-8"
@@ -521,16 +537,8 @@ def tabulo(seanco, id):
         #preta por nova ludo:
         return json.dumps(False)
     tb = tttu.tabulo
-    T = dict([(str(i//9), tb[i:i+9]) for i in range(0, len(tb), 9)])
-    #nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
-    for I, t in T.items():
-        if t[0:3] == 'xxx' or t[3:6] == 'xxx' or t[6:9] == 'xxx' or t[0::3] == 'xxx' or t[1::3] == 'xxx' or t[2::3] == 'xxx' or t[0]+t[4]+t[8] == 'xxx' or t[2]+t[4]+t[6] == 'xxx':
-            T[I] = {'t': T[I], 'S': 'X'}
-        elif t[0:3] == 'ooo' or t[3:6] == 'ooo' or t[6:9] == 'ooo' or t[0::3] == 'ooo' or t[1::3] == 'ooo' or t[2::3] == 'ooo' or t[0]+t[4]+t[8] == 'ooo' or t[2]+t[4]+t[6] == 'ooo':
-            T[I] = {'t': T[I], 'S': 'O'}
-        else:
-            T[I] = {'t': T[I], 'S': 'E'}
-    #nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
+    #MENSNOTO estis sen P:
+    T = Tabuloj(tb)
     #MENSNOTO ambaux uzantoj devas demandi tabulon lastafoje
     if tttu.venkulo == uzanto and not tttu.donita:
         finitaj.append(tttu.id)
@@ -558,7 +566,7 @@ def tabulo(seanco, id):
     tempilo_uzantoX = 0
     tempilo_uzantoO = tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]
     tempilo_uzantoX = tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]
-    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX)})
+    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX), 'egalita':tttu.egalita})
 
 @app.route('/agi/<seanco>/<id>/<I>/<i>')
 def agi(seanco, id, I, i):
@@ -574,45 +582,46 @@ def agi(seanco, id, I, i):
     try:
         tttu = Tu.get((Tu.id == id) & (Tu.uzantoX != naturo) & ((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.venkulo == naturo))
     except Tu.DoesNotExist:
-        return json.dumps('بازی در حال جریان نیست!')
-    if tttu.lastaIndekso != I and tttu.lastaIndekso != -1:
+        return json.dumps('بازی در جریان نیست!')
+    if tttu.vico == uzanto and tttu.lastaIndekso != I and tttu.lastaIndekso != -1:
         return json.dumps('با توجه به حرکت قبلی حریف، تنها در خانه‌های طلایی مجاز به بازی هستید.')
     if tttu.vico != uzanto or tttu.vico == naturo:
         return json.dumps('نوبت شما نیست!')
+    #kalkuli lasta stato de la tabulo:
     tb = tttu.tabulo
-    if tb[I*9+i] == 'e':
-        if uzanto == tttu.uzantoO:
-            tb = anstatauxigi(tb, I*9+i, 'o')
-        elif uzanto == tttu.uzantoX:
-            tb = anstatauxigi(tb, I*9+i, 'x')
-    else:
+    T = Tabuloj(tb)
+    if T[str(I)]['t'][i] != 'e':
         return json.dumps('خالی نیست!')
+    if T[str(I)]['S'] != 'E':
+        return json.dumps('برندهٔ این خانه مشخص شده است و نمی‌توان در آن بازی کرد!')
+    #cxefa ago:
+    if uzanto == tttu.uzantoO:
+        tb = anstatauxigi(tb, I*9+i, 'o')
+    elif uzanto == tttu.uzantoX:
+        tb = anstatauxigi(tb, I*9+i, 'x')
     tttu.tabulo = tb
     tttu.save()
-    T = dict([(str(_//9), tb[_:_+9]) for _ in range(0, len(tb), 9)])
-    #:nun T estas tiel: {'0':'oeexxxeeoe', '1':'eeeoxeoxe', ..., '8':'eoxeoxoxo'}
-    for I, t in T.items():
-        if t[0:3] == 'xxx' or t[3:6] == 'xxx' or t[6:9] == 'xxx' or t[0::3] == 'xxx' or t[1::3] == 'xxx' or t[2::3] == 'xxx' or t[0]+t[4]+t[8] == 'xxx' or t[2]+t[4]+t[6] == 'xxx':
-            T[I] = {'t': T[I], 'S': 'X'}
-        elif t[0:3] == 'ooo' or t[3:6] == 'ooo' or t[6:9] == 'ooo' or t[0::3] == 'ooo' or t[1::3] == 'ooo' or t[2::3] == 'ooo' or t[0]+t[4]+t[8] == 'ooo' or t[2]+t[4]+t[6] == 'ooo':
-            T[I] = {'t': T[I], 'S': 'O'}
-        else:
-            T[I] = {'t': T[I], 'S': 'E'}
-    #:nun T estas tiel: {'0':{'t':'oeexxxeeoe', 'S': 'X'}, '1':{'t':'eoeoxeoxe', 'S':'E'}, ...}
+    #kalkuli nova stato de la tabulo:
+    tb = tttu.tabulo
+    T = Tabuloj(tb)
     ##kontroli se la ludo havas venkulo:
     S = ''
-    for I in range(0,9):
-        S += T[str(I)]['S']
-    #kontrolado de uzanto kun uzantoX kaj uzantoO estas por antauxzorgi kontraux malnecesaj kalkuloj:
+    for III in range(0,9):
+        S += T[str(III)]['S']
+    ##kontrolado de uzanto kun uzantoX kaj uzantoO estas por antauxzorgi kontraux malnecesaj kalkuloj:
     if uzanto == tttu.uzantoX and (S[0:3] == 'XXX' or S[3:6] == 'XXX' or S[6:9] == 'XXX' or S[0::3] == 'XXX' or S[1::3] == 'XXX' or S[2::3] == 'XXX' or S[0]+S[4]+S[8] == 'XXX' or S[2]+S[4]+S[6] == 'XXX'):
         finitaj.append(tttu.id)
         tttu.venkulo = tttu.uzantoX
-    elif uzanto == tttu.uzantoX and (S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO'):
+    elif uzanto == tttu.uzantoO and (S[0:3] == 'OOO' or S[3:6] == 'OOO' or S[6:9] == 'OOO' or S[0::3] == 'OOO' or S[1::3] == 'OOO' or S[2::3] == 'OOO' or S[0]+S[4]+S[8] == 'OOO' or S[2]+S[4]+S[6] == 'OOO'):
         finitaj.append(tttu.id)
         tttu.venkulo = tttu.uzantoO
+    elif not ('E' in S):
+        finitaj.append(tttu.id)
+        tttu.egalita = True
     if T[str(i)]['S'] == 'E':
         tttu.lastaIndekso = i
-    elif T[str(i)]['S'] == 'O' or T[str(i)]['S'] == 'X':
+    #else:
+    elif T[str(i)]['S'] == 'O' or T[str(i)]['S'] == 'X' or T[str(i)]['S'] == 'P':
         tttu.lastaIndekso = -1
     if tttu.vico == tttu.uzantoO:
         tttu.vico = tttu.uzantoX
@@ -620,7 +629,6 @@ def agi(seanco, id, I, i):
     elif tttu.vico == tttu.uzantoX:
         tttu.vico = tttu.uzantoO
         exec('tempilo_{id}.switch_to("uzantoO")'.format(id=str(tttu.id)), globals())
-    tttu.save()
     if uzanto == tttu.uzantoO:
         xo = 'o'
         oponanto = tttu.uzantoX
@@ -631,7 +639,8 @@ def agi(seanco, id, I, i):
     tempilo_uzantoX = 0
     tempilo_uzantoO = tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]
     tempilo_uzantoX = tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]
-    return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX)})
+    tttu.save()
+    return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX), 'egalita':tttu.egalita})
 
 @app.route('/nuligi/<seanco>/<id>')
 def nuligi(seanco, id):

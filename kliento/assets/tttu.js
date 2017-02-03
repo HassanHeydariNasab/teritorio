@@ -4,8 +4,8 @@ if(window.location.toString().match(/android/)){
   r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 else{
-  //r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
-  r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
+  r = new RestClient('http://127.0.0.1:8080', {contentType: 'json'});
+  //r = new RestClient('http://blokado-altajceloj.rhcloud.com', {contentType: 'json'});
 }
 
 var cl = console.log
@@ -40,54 +40,60 @@ function reveni(){
 function preni_tabulojn(){
   var prenita = false
   r.tabuloj(window.localStorage.getItem('seanco')).get().then(function(k){
-    var tuo = ''
-    for(var t in k){
-      if(k[t]['venkulo'] == 'naturo'){
-        k[t]['venkulo'] = 'هیچ‌کس!'
+    if(!!k){
+      //uzanto havas almenaux unu tabulon:
+      var tuo = ''
+      for(var t in k){
+        if(k[t]['venkulo'] == 'naturo'){
+          k[t]['venkulo'] = 'هیچ‌کس!'
+        }
+        if(k[t]['uzantoX'] == 'naturo'){
+          k[t]['uzantoX'] = 'هیچ‌کس!'
+        }
+        if(k[t]['vico'] == 'naturo'){
+          k[t]['vico'] = 'هیچ‌کس!'
+        }
+        tuo += '<option value="'+t+'" >'+persa(t)+' > '+k[t]['uzantoO'] + ' علیه ' + k[t]['uzantoX']+' | نوبت: '+k[t]['vico']+' | پیروز: '+k[t]['venkulo']+'</option>'
       }
-      if(k[t]['uzantoO'] == 'naturo'){
-        k[t]['uzantoO'] = 'هیچ‌کس!'
+      tu.innerHTML = tuo
+      var oj = document.getElementsByTagName('option')
+      if(!(window.localStorage.getItem('elektita') in k) || window.localStorage.getItem('elektita') == 'undefined'){
+        window.localStorage.setItem('elektita', oj[0].value)
       }
-      if(k[t]['uzantoX'] == 'naturo'){
-        k[t]['uzantoX'] = 'هیچ‌کس!'
-      }
-      if(k[t]['vico'] == 'naturo'){
-        k[t]['vico'] = 'هیچ‌کس!'
-      }
-      tuo += '<option value="'+t+'" >'+persa(t)+' > '+k[t]['uzantoO'] + ' علیه ' + k[t]['uzantoX']+' | نوبت: '+k[t]['vico']+' | پیروز: '+k[t]['venkulo']+'</option>'
+      tu.value = window.localStorage.getItem('elektita')
+      finita = false
+      prenita = true
     }
-    tu.innerHTML = tuo
-    if(tuo == ''){
+    else{
+      //uzanto ne havas tabulon:
       finita = true
       rezignu.style.display = 'none'
       rekomencu.style.display = ''
       nuligu.style.display = 'none'
       informoj.innerHTML = 'یک بازی جدید شروع کنید.'
+      prenita = false
     }
-    else{
-      finita = false
-    }
-    tu.value = window.localStorage.getItem('elektita')
   })
-  prenita = true
   return prenita
 }
 r.tabuloj(window.localStorage.getItem('seanco')).get().then(function(k){
-  if(preni_tabulojn()){
-    //trovi lastan ludon:
-    var oj = document.getElementsByTagName('option')
-    if(oj.length > 0){
-      var maks = oj[0].value
-      for(o=0;o<oj.length;o++){
-        if(oj[o].value > maks){
-          maks = oj[o].value
-        }
+  preni_tabulojn()
+  if(!finita){
+    r.tabulo(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
+      if(!k){
+        rezignu.style.display = 'none'
+        rekomencu.style.display = ''
+        nuligu.style.display = 'none'
       }
-      window.localStorage.setItem('elektita', maks)
-    }
-    else{
-      finita = true
-    }
+      else{
+        rezignu.style.display = ''
+        rekomencu.style.display = 'none'
+        nuligu.style.display = 'none'
+        mapi(k)
+      }
+    })
+  }
+  setInterval(function(){
     if(!finita){
       r.tabulo(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
         if(!k){
@@ -98,36 +104,18 @@ r.tabuloj(window.localStorage.getItem('seanco')).get().then(function(k){
         else{
           rezignu.style.display = ''
           rekomencu.style.display = 'none'
-          nuligu.style.display = 'none'
+          if(k['oponanto'] == 'naturo'){
+            nuligu.style.display = ''
+          }
+          else{
+            nuligu.style.display = 'none'
+          }
           mapi(k)
         }
       })
     }
-    setInterval(function(){
-      if(!finita){
-        r.tabulo(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
-          if(!k){
-            rezignu.style.display = 'none'
-            rekomencu.style.display = ''
-            nuligu.style.display = 'none'
-          }
-          else{
-            rezignu.style.display = ''
-            rekomencu.style.display = 'none'
-            if(k['oponanto'] == 'naturo'){
-              nuligu.style.display = ''
-            }
-            else{
-              nuligu.style.display = 'none'
-            }
-            mapi(k)
-          }
-        })
-      }
-    },3000)
-    }
-  })
-
+  },3000)
+})
 tu.addEventListener('change', function(){
   window.localStorage.setItem('elektita', tu.value)
 })
@@ -159,33 +147,44 @@ function mapi(k){
   for(i=0;i<T.length;i++){
     T[i.toString()].className = 'T'
   }
-  if(k['venkulo'] != 'naturo'){
-    informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; پیروز: '+k['venkulo']
+  if(k['egalita']){
+    finita = true
+    informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; مساوی!'
     rezignu.style.display = 'none'
     rekomencu.style.display = ''
     nuligu.style.display = 'none'
-    tempiloj.innerHTML = 'O: '+(300-k['tempilo_uzantoO']).toString()+' ثانیه '+' | X: '+(300-k['tempilo_uzantoX']).toString()+' ثانیه'
+    tempiloj.innerHTML = '&rlm;O: '+persa((300-k['tempilo_uzantoO']).toString())+'s'+' | X: '+persa((300-k['tempilo_uzantoX']).toString())+'s'
   }
-  else if(k['venkulo'] == 'naturo'){
-    informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; نوبت: '+vico
-    rezignu.style.display = ''
-    rekomencu.style.display = 'none'
-    if(k['oponanto'] == 'naturo'){
-      nuligu.style.display = ''
-    }
-    else{
+  else{
+    if(k['venkulo'] != 'naturo'){
+      finita = true
+      informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; پیروز: '+k['venkulo']
+      rezignu.style.display = 'none'
+      rekomencu.style.display = ''
       nuligu.style.display = 'none'
+      tempiloj.innerHTML = '&rlm;O: '+persa((300-k['tempilo_uzantoO']).toString())+'s'+' | X: '+persa((300-k['tempilo_uzantoX']).toString())+'s'
     }
-    tempiloj.innerHTML = 'O: '+k['tempilo_uzantoO'].toString()+' | X: '+k['tempilo_uzantoX'].toString()
+    else if(k['venkulo'] == 'naturo'){
+      informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; نوبت: '+vico
+      rezignu.style.display = ''
+      rekomencu.style.display = 'none'
+      if(k['oponanto'] == 'naturo'){
+        nuligu.style.display = ''
+      }
+      else{
+        nuligu.style.display = 'none'
+      }
+      tempiloj.innerHTML = '&rlm;O: '+persa((300-k['tempilo_uzantoO']).toString())+'s'+' | X: '+persa((300-k['tempilo_uzantoX']).toString())+'s'
+    }
   }
   if(k['uzantoX'] == 'naturo'){
     informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
     rezignu.style.display = 'none'
     rekomencu.style.display = 'none'
     nuligu.style.display = ''
+    tempiloj.innerHTML = ''
   }
   var t = ''
-  var koloro = 'e'
   for (I=0;I<=8;I++){
     t=''
     for (j=0;j<=2;j++){
@@ -193,7 +192,6 @@ function mapi(k){
       for (i=0;i<=2;i++){
         if(mapo[I.toString()]['S'] == 'O'){
           T[I.toString()].className = ' T O'
-          koloro = 'o'
         }
         else if(mapo[I.toString()]['S'] == 'X'){
           T[I.toString()].className = ' T X'
@@ -205,29 +203,31 @@ function mapi(k){
     T[I.toString()].innerHTML = t
   }
   if(lastaIndekso == -1 && vico == uzanto){
-    for(i=0;i<T.length;i++){
-      T[i.toString()].className += ' aktiva'
+    cl(1)
+    for(I=0;I<T.length;I++){
+      if(mapo[I.toString()]['S'] == 'E'){
+        T[I.toString()].className += ' aktiva'
+      }
     }
   }
   else if(lastaIndekso == -1){
-    for(i=0;i<T.length;i++){
-      T[i.toString()].className += ' aktiva_por_aliulo'
+    cl(2)
+    for(I=0;I<T.length;I++){
+      if(mapo[I.toString()]['S'] == 'E'){
+        T[I.toString()].className += ' aktiva_por_aliulo'
+      }
     }
   }
-  else if(vico == uzanto){
+  else if((vico == uzanto) && (mapo[lastaIndekso.toString()]['S'] == 'E')){
     T[lastaIndekso.toString()].className += ' aktiva'
   }
-  else if(vico != uzanto){
+  else if((vico != uzanto) && (mapo[lastaIndekso.toString()]['S'] == 'E')){
     T[lastaIndekso.toString()].className += ' aktiva_por_aliulo'
   }
-  if(k['venkulo'] != 'naturo'){
+  if((k['venkulo'] != 'naturo') || mapo['egalita']){
     for(i=0;i<T.length;i++){
       T[i.toString()].className = T[i.toString()].className.replace('aktiva','').replace('aktiva_por_aliulo','')
     }
-  }
-  if(k['venkulo'] == k['uzanto']){
-  }
-  else{
   }
 }
 
@@ -244,24 +244,25 @@ function rekomenci(){
   r.rekomenci(window.localStorage.getItem('seanco')).get().then(function(k){
     if(k['stato']){
       finita = false
-      if (preni_tabulojn()){
-        informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
-        rezignu.style.display = 'none'
-        rekomencu.style.display = 'none'
-        nuligu.style.display = ''
-        window.localStorage.setItem('elektita', k['id'])
-      }
+      preni_tabulojn()
+      informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
+      rezignu.style.display = 'none'
+      rekomencu.style.display = 'none'
+      nuligu.style.display = ''
+      window.localStorage.setItem('elektita', k['id'])
     }
   })
 }
 
 function nuligi(){
   r.nuligi(window.localStorage.getItem('seanco')+'/'+tu.value).get().then(function(k){
-    window.localStorage.setItem('elektita', tu.value)
-    if (preni_tabulojn()){
+    if(preni_tabulojn()){
+      var oj = document.getElementsByTagName('option')
+      window.localStorage.setItem('elektita', oj[0].value)
       for(i=0;i<T.length;i++){
         T[i.toString()].className = T[i.toString()].className.replace('aktiva','').replace('aktiva_por_aliulo','')
       }
     }
+    finita = false
   })
 }

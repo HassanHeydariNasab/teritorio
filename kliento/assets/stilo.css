@@ -127,7 +127,8 @@ td{
     text-align: center;
     font-size: 4vw;
     direction: rtl;
-    padding: 1.4vh 0px;
+    padding-top: 2.4vh;
+    padding-bottom: 0.4vh;
 }
 #agoj{
     background-color: #212121;

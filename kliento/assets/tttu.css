@@ -21,7 +21,7 @@ body{
     max-height: 100vh;
     overflow-y: hidden;
     overflow-x: hidden;
-    background-color: #212121;
+    background-color: #e0e0e0;
 }
 @keyframes montri_kasxi{
     0%{
@@ -157,7 +157,7 @@ td{
 .T{
     width: 100%;
     height: 100%;
-    border: 2vw #212121 solid;
+    border: 1.4vw #e0e0e0 solid;
 }
 .aktiva{
     background-color: #FDD835;
@@ -198,23 +198,23 @@ td{
 
 }
 #informoj{
-    background-color: #212121;
-    color: white;
+    color: #212121;
     *height: 12vh;
     width: 100%;
     text-align: center;
     font-size: 4vw;
     direction: rtl;
-    padding: 1.4vh 0px;
+    padding: 1vh 0px;
+    border-top: 1vh #212121 solid;
 }
 #tempiloj{
-    background-color: #212121;
-    color: white;
+    color: #212121;
     *height: 12vh;
     width: 100%;
     text-align: center;
     font-size: 4vw;
     direction: rtl;
+    border-bottom: 1vh #212121 solid;
 }
 #revenu{
     width: 100vw;
