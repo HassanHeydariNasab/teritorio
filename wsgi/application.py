@@ -411,9 +411,11 @@ def konverti(seanco, oro):
 #TTTU:
 tempiloj = {}
 finitaj = []
+fintempo = 600
 def kontroli_tempon(tttu):
     global tempiloj
     global finitaj
+    global fintempo
     while True:
         #gxisdatigi tempilo_{id}_uzanto{O|X} je tempiloj:
         exec('tempiloj["tempilo_{id}_uzantoO"] = tempilo_{id}.elapsed_time("uzantoO")'.format(id=tttu.id), globals())
@@ -421,10 +423,10 @@ def kontroli_tempon(tttu):
         if tttu.id in finitaj:
             break
         #kontroli se tempo finis por uzanto:
-        if int(tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]) >= 300:
+        if int(tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]) >= fintempo:
             rezigni(tttu.uzantoO.seanco, tttu.id, mana=True)
             break
-        if int(tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]) >= 300:
+        if int(tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]) >= fintempo:
             rezigni(tttu.uzantoX.seanco, tttu.id, mana=True)
             break
         sleep(1)
@@ -531,6 +533,7 @@ def tabulo(seanco, id):
     naturo = Uzanto.get(Uzanto.id == 1)
     global tempiloj
     global finitaj
+    global fintempo
     try:
         tttu = Tu.get(((Tu.uzantoO == uzanto) | (Tu.uzantoX == uzanto)) & (Tu.id == id))
     except Tu.DoesNotExist:
@@ -566,7 +569,7 @@ def tabulo(seanco, id):
     tempilo_uzantoX = 0
     tempilo_uzantoO = tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]
     tempilo_uzantoX = tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]
-    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX), 'egalita':tttu.egalita})
+    return json.dumps({'Tabulo':T,'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX), 'egalita':tttu.egalita, 'fintempo':fintempo})
 
 @app.route('/agi/<seanco>/<id>/<I>/<i>')
 def agi(seanco, id, I, i):
@@ -575,6 +578,7 @@ def agi(seanco, id, I, i):
     naturo = Uzanto.get(Uzanto.id == 1)
     global tempiloj
     global finitaj
+    global fintempo
     I = int(I)
     i = int(i)
     if I > 8 or i > 8 or I < 0 or i < 0:
@@ -640,7 +644,7 @@ def agi(seanco, id, I, i):
     tempilo_uzantoO = tempiloj['tempilo_{id}_uzantoO'.format(id=str(tttu.id))]
     tempilo_uzantoX = tempiloj['tempilo_{id}_uzantoX'.format(id=str(tttu.id))]
     tttu.save()
-    return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX), 'egalita':tttu.egalita})
+    return json.dumps({'Tabulo':T, 'uzantoO':tttu.uzantoO.nomo, 'uzantoX':tttu.uzantoX.nomo, 'vico':tttu.vico.nomo, 'lastaIndekso':tttu.lastaIndekso, 'uzanto':uzanto.nomo, 'xo':xo, 'oponanto':oponanto.nomo, 'venkulo':tttu.venkulo.nomo, 'tempilo_uzantoO':int(tempilo_uzantoO), 'tempilo_uzantoX':int(tempilo_uzantoX), 'egalita':tttu.egalita, 'fintempo':fintempo})
 
 @app.route('/nuligi/<seanco>/<id>')
 def nuligi(seanco, id):

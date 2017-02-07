@@ -20,7 +20,9 @@ r.res('nuligi')
 
 var T = document.getElementsByClassName('T')
 var informoj = document.getElementById('informoj')
-var tempiloj = document.getElementById('tempiloj')
+var informoj_uzantoO = document.getElementById('informoj_uzantoO')
+var venkulo = document.getElementById('venkulo')
+var informoj_uzantoX = document.getElementById('informoj_uzantoX')
 var tu = document.getElementById('tu')
 var rekomencu = document.getElementById('rekomencu')
 var rezignu = document.getElementById('rezignu')
@@ -33,7 +35,15 @@ nuligu.style.display = 'none'
 function persa(cifero){
   return cifero.replace(/0/g, "۰").replace(/1/g, "۱").replace(/2/g, "۲").replace(/3/g, "۳").replace(/4/g, "۴").replace(/5/g, "۵").replace(/6/g, "۶").replace(/7/g, "۷").replace(/8/g, "۸").replace(/9/g, "۹")
 }
-
+function MSS(s){return(s-(s%=60))/60+(9<s?':':':0')+s}
+function tempili(k){
+  if(k['vico'] == k['uzantoO']){
+    k['tempilo_uzantoO']+=1
+    informoj_uzantoO.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoO'])).toString())+'<br>'+k['uzantoO']}
+  else if(k['vico'] == k['uzantoX']){
+    k['tempilo_uzantoX']+=1
+    informoj_uzantoX.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoX'])).toString())+'<br>'+k['uzantoX']}
+}
 function reveni(){
   window.location = 'ludo.html'
 }
@@ -70,7 +80,11 @@ function preni_tabulojn(){
       rezignu.style.display = 'none'
       rekomencu.style.display = ''
       nuligu.style.display = 'none'
-      informoj.innerHTML = 'یک بازی جدید شروع کنید.'
+      venkulo.innerHTML = 'یک بازی جدید شروع کنید.'
+      informoj_uzantoO.innerHTML = ''
+      informoj_uzantoX.innerHTML = ''
+      informoj_uzantoO.className = ''
+      informoj_uzantoX.className = ''
       prenita = false
     }
   })
@@ -127,7 +141,7 @@ function agi(I, i){
       }
       else{
         mapi(k)
-      }
+       }
     })
   }
 }
@@ -140,32 +154,56 @@ function mapi(k){
   var uzanto = k['uzanto']
   var vico = k['vico']
   var lastaIndekso = k['lastaIndekso']
-  if(k['venkulo'] == uzanto){
-    k['venkulo'] = 'شما'
-  }
-  k['uzanto'] = 'شما'
+  //reagordi Tabulojn:
   for(i=0;i<T.length;i++){
     T[i.toString()].className = 'T'
   }
-  if(k['egalita']){
+  if(k['uzantoX'] == 'naturo'){
+    venkulo.innerHTML = 'در انتظار یک بازیکن دیگر…'
+    informoj_uzantoO.innerHTML = ''
+    informoj_uzantoX.innerHTML = ''
+    informoj_uzantoO.className = ''
+    informoj_uzantoX.className = ''
+    rezignu.style.display = 'none'
+    rekomencu.style.display = 'none'
+    nuligu.style.display = ''
+  }
+  else if(k['egalita']){
     finita = true
-    informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; مساوی!'
     rezignu.style.display = 'none'
     rekomencu.style.display = ''
     nuligu.style.display = 'none'
-    tempiloj.innerHTML = '&rlm;O: '+persa((300-k['tempilo_uzantoO']).toString())+'s'+' | X: '+persa((300-k['tempilo_uzantoX']).toString())+'s'
+    informoj_uzantoO.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoO'])).toString())+'<br>'+k['uzantoO']
+    informoj_uzantoX.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoX'])).toString())+'<br>'+k['uzantoX']
+    informoj_uzantoO.className = ''
+    informoj_uzantoX.className = ''
+    venkulo.innerHTML = 'مساوی!'
   }
   else{
     if(k['venkulo'] != 'naturo'){
       finita = true
-      informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; پیروز: '+k['venkulo']
       rezignu.style.display = 'none'
       rekomencu.style.display = ''
       nuligu.style.display = 'none'
-      tempiloj.innerHTML = '&rlm;O: '+persa((300-k['tempilo_uzantoO']).toString())+'s'+' | X: '+persa((300-k['tempilo_uzantoX']).toString())+'s'
+      informoj_uzantoO.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoO'])).toString())+'<br>'+k['uzantoO']
+      informoj_uzantoX.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoX'])).toString())+'<br>'+k['uzantoX']
+      informoj_uzantoO.className = ''
+      informoj_uzantoX.className = ''
+      venkulo.innerHTML = 'پیروز: '+k['venkulo']
     }
     else if(k['venkulo'] == 'naturo'){
-      informoj.innerHTML = k['uzanto']+' علیه '+k['oponanto']+'<br>'+'نشانهٔ شما: '+k['xo']+' &nbsp; نوبت: '+vico
+      var n = 0
+      function voki_tempiladon(){
+        if (n < 3){
+          tempili(k)
+          n++
+        }
+        else{
+          clearInterval(t)
+        }
+      }
+      var t = setInterval(voki_tempiladon,1000)
+      venkulo.innerHTML = ''
       rezignu.style.display = ''
       rekomencu.style.display = 'none'
       if(k['oponanto'] == 'naturo'){
@@ -174,15 +212,18 @@ function mapi(k){
       else{
         nuligu.style.display = 'none'
       }
-      tempiloj.innerHTML = '&rlm;O: '+persa((300-k['tempilo_uzantoO']).toString())+'s'+' | X: '+persa((300-k['tempilo_uzantoX']).toString())+'s'
+      informoj_uzantoO.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoO'])).toString())+'<br>'+k['uzantoO']
+      informoj_uzantoX.innerHTML = persa(MSS((k['fintempo']-k['tempilo_uzantoX'])).toString())+'<br>'+k['uzantoX']
+      if(k['vico'] == k['uzantoO']){
+        informoj_uzantoO.className = 'blinki'
+        informoj_uzantoX.className = ''
+      }
+      //else:
+      else if(k['vico'] == k['uzantoX']){
+        informoj_uzantoO.className = ''
+        informoj_uzantoX.className = 'blinki'
+      }
     }
-  }
-  if(k['uzantoX'] == 'naturo'){
-    informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
-    rezignu.style.display = 'none'
-    rekomencu.style.display = 'none'
-    nuligu.style.display = ''
-    tempiloj.innerHTML = ''
   }
   var t = ''
   for (I=0;I<=8;I++){
@@ -203,7 +244,6 @@ function mapi(k){
     T[I.toString()].innerHTML = t
   }
   if(lastaIndekso == -1 && vico == uzanto){
-    cl(1)
     for(I=0;I<T.length;I++){
       if(mapo[I.toString()]['S'] == 'E'){
         T[I.toString()].className += ' aktiva'
@@ -211,7 +251,6 @@ function mapi(k){
     }
   }
   else if(lastaIndekso == -1){
-    cl(2)
     for(I=0;I<T.length;I++){
       if(mapo[I.toString()]['S'] == 'E'){
         T[I.toString()].className += ' aktiva_por_aliulo'
@@ -245,7 +284,11 @@ function rekomenci(){
     if(k['stato']){
       finita = false
       preni_tabulojn()
-      informoj.innerHTML = 'در انتظار یک بازیکن دیگر…'
+      venkulo.innerHTML = 'در انتظار یک بازیکن دیگر…'
+      informoj_uzantoO.innerHTML = ''
+      informoj_uzantoX.innerHTML = ''
+      informoj_uzantoO.className = ''
+      informoj_uzantoX.className = ''
       rezignu.style.display = 'none'
       rekomencu.style.display = 'none'
       nuligu.style.display = ''
